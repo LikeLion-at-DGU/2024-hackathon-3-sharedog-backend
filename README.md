@@ -7,21 +7,32 @@
 
 | 이름   | 전공           |
 | ------ | -------------- |
-| 김진우 | 산업시스템공학과   |
-| 황채현 | 전자전기공학과       |
+| 김진우 | 산업시스템공학과 |
+| 황채현 | 전자전기공학부   |
 
 ## 💻 프로젝트 설정& 가상환경 실행 방법
 
 ```
-npm install
-npm install react-router-dom
-npm install styled-component
-npm install axios
+# 가상환경 만들기(처음에만)
+python -m venv venv
+# mac
+#python3 -m venv venv
+
+#가상환경 실행(파일 열 때마다)
+source venv/Scripts/activate
+# mac
+# source venv/bin/activate
+
+# 가상환경 종료시키기
+deactivate
+
+#가상환경 킨 후
+pip install django
+
+# 서비스에 설치되 패키지 다운 받는 법
+pip install -r requirements.txt
 ```
 
-```
-npm run dev
-```
 ## 🎯 Commit Convention
 
 "태그:제목"의 형태이며, : 뒤에만 space가 있음에 유의합니다. ex) Feat: 메인페이지 추가
