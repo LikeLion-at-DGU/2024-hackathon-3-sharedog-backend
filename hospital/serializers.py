@@ -6,3 +6,5 @@ class HospitalSerializer(serializers.Modelserializer):
     class Meta:
         model = Hospital
         fields = '__all__'
+
+        
