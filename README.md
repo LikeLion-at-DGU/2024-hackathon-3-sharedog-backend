@@ -3,7 +3,7 @@
 </div>
 <br>
 
-## 👋 팀원 소개 - Frontend Team
+## 👋 팀원 소개 - Backend Team
 
 | 이름   | 전공           |
 | ------ | -------------- |
@@ -17,20 +17,23 @@
 python -m venv venv
 # mac
 #python3 -m venv venv
-
+```
+```
 #가상환경 실행(파일 열 때마다)
 source venv/Scripts/activate
 # mac
 # source venv/bin/activate
-
-# 가상환경 종료시키기
-deactivate
-
+```
+```
 #가상환경 킨 후
 pip install django
 
 # 서비스에 설치되 패키지 다운 받는 법
 pip install -r requirements.txt
+```
+```
+# 가상환경 종료시키기
+deactivate
 ```
 
 ## 🎯 Commit Convention
