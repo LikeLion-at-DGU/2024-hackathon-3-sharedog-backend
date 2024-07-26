@@ -11,6 +11,7 @@ class HospitalListSerializer(serializers.ModelSerializer):
             'place',
             'created_at',
             'updated_at',
+            'image',
         ]
 
 class HospitalSerializer(serializers.ModelSerializer):
