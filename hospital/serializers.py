@@ -1,6 +1,18 @@
 from rest_framework import serializers
 from .models import *
 
+class HospitalListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Hospital
+        fields = [
+            'id',
+            'name',
+            'region',
+            'place',
+            'created_at',
+            'updated_at',
+        ]
+
 class HospitalSerializer(serializers.ModelSerializer):
 
     reservation = serializers.SerializerMethodField(read_only=True)
