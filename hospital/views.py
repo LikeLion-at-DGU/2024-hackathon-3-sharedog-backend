@@ -2,7 +2,7 @@ from django.shortcuts import get_object_or_404, render
 from .models import *
 from rest_framework import viewsets, mixins
 from rest_framework.decorators import action
-from .serializers import HospitalSerializer, DogSerializer, ReservationSerializer
+from .serializers import HospitalListSerializer, HospitalSerializer, DogSerializer, ReservationSerializer
 from rest_framework import status
 from rest_framework.response import Response
 
@@ -10,7 +10,11 @@ from rest_framework.response import Response
 
 class HospitalViewSet(viewsets.ModelViewSet):
     queryset = Hospital.objects.all()
-    serializer_class = HospitalSerializer
+    
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return HospitalListSerializer
+        return HospitalSerializer
 
     # action을 이용해서 특정 지역에 해당하는 filtering
     @action(methods=["GET"], detail=False)
