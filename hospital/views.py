@@ -96,3 +96,4 @@ class ReservationUserViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mix
         queryset = self.filter_queryset(self.get_queryset().filter(dog=dog))
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
+    
