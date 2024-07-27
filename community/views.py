@@ -1,4 +1,6 @@
+from django.forms import ValidationError
 from django.shortcuts import render, get_object_or_404
+from django.db.models import Q
 from rest_framework import viewsets, mixins
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -15,6 +17,24 @@ class PostViewSet(viewsets.ModelViewSet):
         if self.action == "list":
             return PostListSerializer
         return PostSerializer
+    
+    def get_queryset(self):
+        search_keyword = self.request.GET.get('q', '')
+        post_list = Post.objects.all()
+        
+        if search_keyword:
+            if len(search_keyword) > 1:
+                search_post_list = post_list.filter(
+                    Q(title__icontains=search_keyword) | 
+                    Q(content__icontains=search_keyword) |
+                    Q(blood__icontains=search_keyword) |
+                    Q(region__icontains=search_keyword)
+                ).order_by('title', 'content', 'blood', 'region')
+                return search_post_list
+            else:
+                raise ValidationError({'detail': '검색어는 2글자 이상 입력해주세요'})
+
+        return post_list
 
     def create(self, request):
         serializer = self.get_serializer(data=request.data)

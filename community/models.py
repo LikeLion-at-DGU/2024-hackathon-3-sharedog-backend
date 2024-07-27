@@ -12,7 +12,16 @@ class Post(models.Model):
     content = models.CharField(max_length=300)
 
     region = models.CharField(max_length=100)
-    blood = models.CharField(max_length=100)
+    DOG_BLOOD_TYPES = [
+        ('DEA 1-', 'DEA 1-'),
+        ('DEA 1.1', 'DEA 1.1'),
+        ('DEA 1.2', 'DEA 1.2'),
+        ('DEA 3', 'DEA 3'),
+        ('DEA 4', 'DEA 4'),
+        ('DEA 5', 'DEA 5'),
+        ('DEA 6', 'DEA 6'),
+        ('DEA 7', 'DEA 7'),
+    ]
     
     image = models.ImageField(upload_to=image_upload_path, blank=True, null=True)
     
