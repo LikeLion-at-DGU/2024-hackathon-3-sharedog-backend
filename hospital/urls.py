@@ -27,5 +27,5 @@ urlpatterns = [
     path('', include(dog_router.urls)),
     path('reservation/', include(reservation_check_router.urls)),
     path('', include(reservation_router.urls)),
-    path('<int:hospital_id>/', include(hospital_reservation_router.urls)),
+    path('home/<int:hospital_id>/', include(hospital_reservation_router.urls)),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
