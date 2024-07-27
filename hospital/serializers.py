@@ -15,8 +15,8 @@ class HospitalListSerializer(serializers.ModelSerializer):
         ]
 
 class HospitalSerializer(serializers.ModelSerializer):
-
     reservation = serializers.SerializerMethodField(read_only=True)
+    
     def get_reservation(self, instance):
         serializer = ReservationSerializer(instance.reservations, many=True)
         return serializer.data
@@ -32,6 +32,7 @@ class HospitalSerializer(serializers.ModelSerializer):
 
 class DogSerializer(serializers.ModelSerializer):
     user = serializers.SerializerMethodField(read_only=True)
+    
     def get_user(self, instance):
         return instance.user.username
 
@@ -46,17 +47,11 @@ class DogSerializer(serializers.ModelSerializer):
         ]
 
 class ReservationSerializer(serializers.ModelSerializer):
-
-    hospital = serializers.SerializerMethodField(read_only=True)
-    def get_hospital(self, instance):
-        hospital = instance.hospital
-        return hospital.name
-    
-    dog = serializers.SerializerMethodField(read_only=True)
-    def get_dog(self, instance):
-        return instance.dog.dog_name
+    hospital = serializers.CharField(source='hospital.name', read_only=True)
+    user = serializers.CharField(source='user.username', read_only=True)
+    dog = serializers.CharField(source='dog.dog_name', read_only=True)
     
     class Meta:
         model = Reservation
         fields = '__all__'
-        read_only_fields = ['hospital', 'dog']
+        read_only_fields = ['hospital', 'user', 'dog']
