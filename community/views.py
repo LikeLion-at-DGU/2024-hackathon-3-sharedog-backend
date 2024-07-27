@@ -1,7 +1,7 @@
 from django.forms import ValidationError
 from django.shortcuts import render, get_object_or_404
 from django.db.models import Q
-from rest_framework import viewsets, mixins
+from rest_framework import viewsets, mixins, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 
@@ -38,7 +38,10 @@ class PostViewSet(viewsets.ModelViewSet):
 
     def create(self, request):
         serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
+        try:
+            serializer.is_valid(raise_exception=True)
+        except ValidationError as e:
+            return Response(e.detail, status=status.HTTP_400_BAD_REQUEST)
         self.perform_create(serializer)
         return Response(serializer.data)
     
