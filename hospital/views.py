@@ -6,6 +6,7 @@ from .serializers import HospitalListSerializer, HospitalSerializer, DogSerializ
 from rest_framework import status
 from rest_framework.response import Response
 
+
 # Create your views here.
 
 class HospitalViewSet(viewsets.ModelViewSet):
@@ -47,6 +48,7 @@ class HospitalViewSet(viewsets.ModelViewSet):
         jeju_hospital = self.filter_queryset(self.get_queryset().filter(region='제주도'))
         jeju_hospital_serializer = HospitalSerializer(jeju_hospital, many=True)
         return Response(jeju_hospital_serializer.data)
+    
 class DogViewSet(viewsets.ModelViewSet):
     queryset = Dog.objects.all()
     serializer_class = DogSerializer
@@ -79,11 +81,12 @@ class HospitalReservationViewSet(viewsets.GenericViewSet, mixins.ListModelMixin,
     
     def create(self, request, hospital_id=None):
         hospital = get_object_or_404(Hospital, id=hospital_id)
-        user = self.request.user
+        user_id = self.request.user.id
+        user = get_object_or_404(User, id=user_id)
         dog = Dog.objects.filter(user=user).first()
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save(hospital=hospital, dog=dog)
+        serializer.save(hospital=hospital, dog=dog, user=user)
         return Response(serializer.data)
 
 class ReservationUserViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.DestroyModelMixin):
@@ -92,8 +95,7 @@ class ReservationUserViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mix
 
     def list(self, request, user_id=None):
         user = self.request.user
-        dog = Dog.objects.filter(user=user).first()
-        queryset = self.filter_queryset(self.get_queryset().filter(dog=dog))
+        queryset = self.filter_queryset(self.get_queryset().filter(user=user))
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
     
