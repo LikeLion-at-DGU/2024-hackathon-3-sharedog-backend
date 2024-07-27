@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework import routers
-from .views import SizetestViewSet, AgetestViewSet, WeighttestViewSet, VaccinetestViewSet, DiseasetestViewSet
+from .views import SizetestViewSet, AgetestViewSet, WeighttestViewSet, VaccinetestViewSet, DiseasetestViewSet, TotaltestViewSet
 
 from django.conf import settings
 
@@ -12,6 +12,7 @@ default_router.register("agetests", AgetestViewSet, basename="agetests")
 default_router.register("weighttests", WeighttestViewSet, basename="weighttests")
 default_router.register("vaccinetests", VaccinetestViewSet, basename="vaccinetests")
 default_router.register("diseasetests", DiseasetestViewSet, basename="diseasetests")
+default_router.register("totaltests", TotaltestViewSet, basename="totaltests")
 
 urlpatterns = [
     path("", include(default_router.urls)),

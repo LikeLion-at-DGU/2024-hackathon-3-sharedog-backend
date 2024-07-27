@@ -53,3 +53,14 @@ class DiseasetestSerializer(serializers.ModelSerializer):
     class Meta:
         model = Diseasetest
         fields = ['id', 'writer', 'has_disease']
+
+class TotaltestSerializer(serializers.ModelSerializer):
+    sizetest = SizetestSerializer().serializer_related_field
+    agetest = AgetestSerializer().serializer_related_field
+    weighttest = WeighttestSerializer().serializer_related_field
+    vaccinetest = VaccinetestSerializer().serializer_related_field
+    diseasetest = DiseasetestSerializer().serializer_related_field
+
+    class Meta:
+        model = Totaltest
+        fields = '__all__'

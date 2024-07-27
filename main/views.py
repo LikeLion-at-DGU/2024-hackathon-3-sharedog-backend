@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404
-from rest_framework import viewsets, mixins
+from rest_framework import viewsets, mixins, status
 from .models import Sizetest, Agetest, Weighttest, Vaccinetest, Diseasetest, Totaltest
-from .serializers import SizetestSerializer, AgetestSerializer, WeighttestSerializer, VaccinetestSerializer, DiseasetestSerializer
+from .serializers import SizetestSerializer, AgetestSerializer, WeighttestSerializer, VaccinetestSerializer, DiseasetestSerializer, TotaltestSerializer
 from rest_framework.response import Response
 
 class SizetestViewSet(viewsets.ModelViewSet):
@@ -68,3 +68,22 @@ class DiseasetestViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(writer=self.request.user)
         
+
+class TotaltestViewSet(viewsets.ViewSet):
+    def list(self, request, *args, **kwargs):
+        sizetest = Sizetest.objects.filter(writer=self.request.user).last()
+        agetest = Agetest.objects.filter(writer=self.request.user).last()
+        weighttest = Weighttest.objects.filter(writer=self.request.user).last()
+        diseasetest = Diseasetest.objects.filter(writer=self.request.user).last()
+        vaccinetest = Vaccinetest.objects.filter(writer=self.request.user).last()
+
+        # Combine and serialize separately
+        # For example, you could use different serializers for each queryset
+        data = {
+            'sizetest': SizetestSerializer(sizetest).data,
+            'agetest': AgetestSerializer(agetest).data,
+            'weighttest': WeighttestSerializer(weighttest).data,
+            'diseasetest': DiseasetestSerializer(diseasetest).data,
+            'vaccinetest': VaccinetestSerializer(vaccinetest).data,
+        }
+        return Response(data)

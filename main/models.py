@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 
 # Create your models here.
 class Sizetest(models.Model):
+    id = models.AutoField(primary_key=True)
     writer = models.ForeignKey(User, on_delete=models.CASCADE, default='')
     SIZE_CHOICES = [
         ('SM', '소형견'),
@@ -14,6 +15,7 @@ class Sizetest(models.Model):
         return self.get_size_display()
     
 class Agetest(models.Model):
+    id = models.AutoField(primary_key=True)
     writer = models.ForeignKey(User, on_delete=models.CASCADE, default='')
     AGE_CHOICES = [
         ('UNDER_18M', '18개월 미만'),
@@ -26,6 +28,7 @@ class Agetest(models.Model):
         return self.get_age_group_display()
     
 class Weighttest(models.Model):
+    id = models.AutoField(primary_key=True)
     writer = models.ForeignKey(User, on_delete=models.CASCADE, default='')
     WEIGHT_CHOICES = [
         ('UNDER_20KG', '20kg 이하'),
@@ -38,6 +41,7 @@ class Weighttest(models.Model):
         return self.get_weight_group_display()
     
 class Vaccinetest(models.Model):
+    id = models.AutoField(primary_key=True)
     writer = models.ForeignKey(User, on_delete=models.CASCADE, default='')
     VACCINE_CHOICES = [
         ('YES', '네'),
@@ -50,6 +54,7 @@ class Vaccinetest(models.Model):
         return self.get_is_vaccinated_display()  
 
 class Diseasetest(models.Model):
+    id = models.AutoField(primary_key=True)
     writer = models.ForeignKey(User, on_delete=models.CASCADE, default='')
     DISEASE_CHOICES = [
         ('YES', '네'),
@@ -62,9 +67,10 @@ class Diseasetest(models.Model):
         return self.get_has_disease_display()
     
 class Totaltest(models.Model):
-    writer = models.ForeignKey(User, on_delete=models.CASCADE, default='')
-    sizetest = models.OneToOneField(Sizetest, on_delete=models.CASCADE)
-    agetest = models.OneToOneField(Agetest, on_delete=models.CASCADE)
-    weighttest = models.OneToOneField(Weighttest, on_delete=models.CASCADE)
-    vaccinetest = models.OneToOneField(Vaccinetest, on_delete=models.CASCADE)
-    diseasetest = models.OneToOneField(Diseasetest, on_delete=models.CASCADE)
+    id = models.AutoField(primary_key=True)
+    writer = models.ForeignKey(User, on_delete=models.CASCADE)
+    size = models.OneToOneField(Sizetest, on_delete=models.CASCADE)
+    age_group = models.OneToOneField(Agetest, on_delete=models.CASCADE)
+    weight_group = models.OneToOneField(Weighttest, on_delete=models.CASCADE)
+    is_vaccinated = models.OneToOneField(Vaccinetest, on_delete=models.CASCADE)
+    has_disease = models.OneToOneField(Diseasetest, on_delete=models.CASCADE)
