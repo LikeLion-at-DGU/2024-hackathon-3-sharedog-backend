@@ -33,6 +33,13 @@ class PostSerializer(serializers.ModelSerializer):
         serializer = CommentSerializer(instance.comments, many=True)
         return serializer.data
 
+    def validate(self, data):
+        if 'blood' not in data or not data['blood']:
+            raise serializers.ValidationError({"blood": "Blood type is required."})
+        if 'region' not in data or not data['region']:
+            raise serializers.ValidationError({"region": "Region is required."})
+        return data
+
     like = serializers.SerializerMethodField(read_only=True)
     # 이거는 확인용임(추후에 없앨수도)
     def get_like(self, instance):
