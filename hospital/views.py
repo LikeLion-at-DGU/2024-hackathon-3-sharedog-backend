@@ -1,3 +1,5 @@
+from rest_framework.exceptions import ValidationError
+from django.db.models import Q
 from django.shortcuts import get_object_or_404, render
 from .models import *
 from rest_framework import viewsets, mixins
@@ -16,6 +18,19 @@ class HospitalViewSet(viewsets.ModelViewSet):
         if self.action == 'list':
             return HospitalListSerializer
         return HospitalSerializer
+
+    def get_queryset(self):
+        search_keyword = self.request.GET.get('q', '')
+        hospital_list = Hospital.objects.all()
+
+        if search_keyword:
+            if len(search_keyword) > 1:
+                search_hospital_list = hospital_list.filter(name__icontains=search_keyword)
+                return search_hospital_list
+            else:
+                raise ValidationError({'detail': '검색어는 2글자 이상 입력해주세요'})
+
+        return hospital_list
 
     # action을 이용해서 특정 지역에 해당하는 filtering
     @action(methods=["GET"], detail=False)
