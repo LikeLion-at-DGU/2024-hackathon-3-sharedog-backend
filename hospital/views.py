@@ -19,6 +19,15 @@ class HospitalViewSet(viewsets.ModelViewSet):
             return HospitalListSerializer
         return HospitalSerializer
 
+    def create(self, request):
+        serializer = self.get_serializer(data=request.data)
+        try:
+            serializer.is_valid(raise_exception=True)
+        except ValidationError as e:
+            return Response(e.detail, status=status.HTTP_400_BAD_REQUEST)
+        self.perform_create(serializer)
+        return Response(serializer.data)
+
     def get_queryset(self):
         search_keyword = self.request.GET.get('q', '')
         hospital_list = Hospital.objects.all()
@@ -40,27 +49,27 @@ class HospitalViewSet(viewsets.ModelViewSet):
         return Response(seoul_hospital_serializer.data)
     @action(methods=["GET"], detail=False)
     def gyeonggi(self, request):
-        gyeonggi_hospital = self.filter_queryset(self.get_queryset().filter(region='경기도'))
+        gyeonggi_hospital = self.filter_queryset(self.get_queryset().filter(region='경기'))
         gyeonggi_hospital_serializer = HospitalSerializer(gyeonggi_hospital, many=True)
         return Response(gyeonggi_hospital_serializer.data)
     @action(methods=["GET"], detail=False)
     def gyeongsang(self, request):
-        gyeongsang_hospital = self.filter_queryset(self.get_queryset().filter(region='경상도'))
+        gyeongsang_hospital = self.filter_queryset(self.get_queryset().filter(region='경상'))
         gyeongsang_hospital_serializer = HospitalSerializer(gyeongsang_hospital, many=True)
         return Response(gyeongsang_hospital_serializer.data)
     @action(methods=["GET"], detail=False)
     def chungcheong(self, request):
-        chungcheong_hospital = self.filter_queryset(self.get_queryset().filter(region='충청도'))
+        chungcheong_hospital = self.filter_queryset(self.get_queryset().filter(region='충청'))
         chungcheong_hospital_serializer = HospitalSerializer(chungcheong_hospital, many=True)
         return Response(chungcheong_hospital_serializer.data)
     @action(methods=["GET"], detail=False)
     def jeolla(self, request):
-        jeolla_hospital = self.filter_queryset(self.get_queryset().filter(region='전라도'))
+        jeolla_hospital = self.filter_queryset(self.get_queryset().filter(region='전라'))
         jeolla_hospital_serializer = HospitalSerializer(jeolla_hospital, many=True)
         return Response(jeolla_hospital_serializer.data)
     @action(methods=["GET"], detail=False)
     def jeju(self, request):
-        jeju_hospital = self.filter_queryset(self.get_queryset().filter(region='제주도'))
+        jeju_hospital = self.filter_queryset(self.get_queryset().filter(region='제주'))
         jeju_hospital_serializer = HospitalSerializer(jeju_hospital, many=True)
         return Response(jeju_hospital_serializer.data)
     

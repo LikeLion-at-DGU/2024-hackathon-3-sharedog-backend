@@ -21,6 +21,11 @@ class HospitalSerializer(serializers.ModelSerializer):
         serializer = ReservationSerializer(instance.reservations, many=True)
         return serializer.data
     
+    def validate(self, data):
+        if 'region' not in data or not data['region']:
+            raise serializers.ValidationError({"region": "Region is required."})
+        return data
+
     class Meta:
         model = Hospital
         fields = '__all__'
