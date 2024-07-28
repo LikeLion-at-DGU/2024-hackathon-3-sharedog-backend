@@ -55,12 +55,15 @@ class DiseasetestSerializer(serializers.ModelSerializer):
         fields = ['id', 'writer', 'has_disease']
 
 class TotaltestSerializer(serializers.ModelSerializer):
-    sizetest = SizetestSerializer().serializer_related_field
-    agetest = AgetestSerializer().serializer_related_field
-    weighttest = WeighttestSerializer().serializer_related_field
-    vaccinetest = VaccinetestSerializer().serializer_related_field
-    diseasetest = DiseasetestSerializer().serializer_related_field
-
+    size = SizetestSerializer()
+    age_group = AgetestSerializer()
+    weight_group = WeighttestSerializer()
+    is_vaccinated = VaccinetestSerializer()
+    has_disease = DiseasetestSerializer()
+    writer = serializers.SerializerMethodField(read_only=True)
+    def get_writer(self, instance):
+        writer = instance.writer
+        return writer.username
     class Meta:
         model = Totaltest
         fields = '__all__'
