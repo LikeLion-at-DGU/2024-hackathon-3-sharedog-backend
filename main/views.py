@@ -66,24 +66,24 @@ class DiseasetestViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
     
     def perform_create(self, serializer):
-        serializer.save(writer=self.request.user)
+        disease_instance = serializer.save(writer=self.request.user)
+
+        latest_size = Sizetest.objects.filter(writer=self.request.user).latest('id')
+        latest_age = Agetest.objects.filter(writer=self.request.user).latest('id')
+        latest_weight = Weighttest.objects.filter(writer=self.request.user).latest('id')
+        latest_vaccine = Vaccinetest.objects.filter(writer=self.request.user).latest('id')
+
+        # 새로운 Totaltest 객체를 생성
+        Totaltest.objects.create(
+            writer=self.request.user,
+            size=latest_size,
+            age_group=latest_age,
+            weight_group=latest_weight,
+            is_vaccinated=latest_vaccine,
+            has_disease=disease_instance
+        )
         
 
-class TotaltestViewSet(viewsets.ViewSet):
-    def list(self, request, *args, **kwargs):
-        sizetest = Sizetest.objects.filter(writer=self.request.user).last()
-        agetest = Agetest.objects.filter(writer=self.request.user).last()
-        weighttest = Weighttest.objects.filter(writer=self.request.user).last()
-        diseasetest = Diseasetest.objects.filter(writer=self.request.user).last()
-        vaccinetest = Vaccinetest.objects.filter(writer=self.request.user).last()
-
-        # Combine and serialize separately
-        # For example, you could use different serializers for each queryset
-        data = {
-            'sizetest': SizetestSerializer(sizetest).data,
-            'agetest': AgetestSerializer(agetest).data,
-            'weighttest': WeighttestSerializer(weighttest).data,
-            'diseasetest': DiseasetestSerializer(diseasetest).data,
-            'vaccinetest': VaccinetestSerializer(vaccinetest).data,
-        }
-        return Response(data)
+class TotaltestViewSet(viewsets.ModelViewSet):
+    queryset = Totaltest.objects.all()
+    serializer_class = TotaltestSerializer

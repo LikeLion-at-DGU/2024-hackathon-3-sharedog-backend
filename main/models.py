@@ -69,8 +69,8 @@ class Diseasetest(models.Model):
 class Totaltest(models.Model):
     id = models.AutoField(primary_key=True)
     writer = models.ForeignKey(User, on_delete=models.CASCADE)
-    size = models.OneToOneField(Sizetest, on_delete=models.CASCADE)
-    age_group = models.OneToOneField(Agetest, on_delete=models.CASCADE)
-    weight_group = models.OneToOneField(Weighttest, on_delete=models.CASCADE)
-    is_vaccinated = models.OneToOneField(Vaccinetest, on_delete=models.CASCADE)
-    has_disease = models.OneToOneField(Diseasetest, on_delete=models.CASCADE)
+    size = models.ForeignKey(Sizetest, on_delete=models.CASCADE)
+    age_group = models.ForeignKey(Agetest, on_delete=models.CASCADE)
+    weight_group = models.ForeignKey(Weighttest, on_delete=models.CASCADE)
+    is_vaccinated = models.ForeignKey(Vaccinetest, on_delete=models.CASCADE)
+    has_disease = models.ForeignKey(Diseasetest, on_delete=models.CASCADE)
