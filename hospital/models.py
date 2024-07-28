@@ -8,7 +8,18 @@ def image_upload_path(instance, filename):
 class Hospital(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=150)
-    region = models.CharField(max_length=100)
+    REGION_TYPES = [
+        (None, '지역'),
+        ('서울', '서울'),
+        ('경기', '경기'),
+        ('인천', '인천'),
+        ('강원', '강원'),
+        ('경상', '경상'),
+        ('충청', '충청'),
+        ('전라', '전라'),
+        ('제주', '제주'),
+    ]
+    region = models.CharField(max_length=50, choices=REGION_TYPES, default='지역')
     tel_num = models.CharField(max_length=100)
     place = models.CharField(max_length=150)
     created_at = models.DateTimeField(auto_now_add=True)
