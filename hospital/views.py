@@ -4,7 +4,7 @@ from django.shortcuts import get_object_or_404, render
 from .models import *
 from rest_framework import viewsets, mixins
 from rest_framework.decorators import action
-from .serializers import HospitalListSerializer, HospitalSerializer, DogSerializer, ReservationSerializer
+from .serializers import HospitalListSerializer, HospitalSerializer,  ReservationSerializer
 from rest_framework import status
 from rest_framework.response import Response
 
@@ -73,22 +73,6 @@ class HospitalViewSet(viewsets.ModelViewSet):
         jeju_hospital_serializer = HospitalSerializer(jeju_hospital, many=True)
         return Response(jeju_hospital_serializer.data)
     
-class DogViewSet(viewsets.ModelViewSet):
-    queryset = Dog.objects.all()
-    serializer_class = DogSerializer
-
-    def list(self, request, user_id=None):
-        user = self.request.user
-        queryset = self.filter_queryset(self.get_queryset().filter(user=user))
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
-
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
-
-    def perform_update(self, serializer):
-        serializer.save(user=self.request.user)
-
 class ReservationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin, mixins.DestroyModelMixin):
     queryset = Reservation.objects.all()
     serializer_class = ReservationSerializer
