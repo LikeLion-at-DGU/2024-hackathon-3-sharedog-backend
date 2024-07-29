@@ -13,6 +13,11 @@ class Profile(models.Model):
 
     phone = models.CharField(max_length=40)
     email = models.CharField(max_length=40)
+    
+
+class DogProfile(models.Model):
+
+    id = models.AutoField(primary_key=True)
     dogname = models.CharField(max_length=40)
 
     GENDER_M = "male"
@@ -33,9 +38,8 @@ class Profile(models.Model):
         ('DEA 3', 'DEA 3'),
         ('DEA 4', 'DEA 4'),
         ('DEA 5', 'DEA 5'),
-        ('DEA 6', 'DEA 6'),
         ('DEA 7', 'DEA 7'),
     ]
 
     # 다른 필드들
-    dog_blood = models.CharField(max_length=10, choices=DOG_BLOOD_TYPES)
+    dog_blood = models.CharField(max_length=15, choices=DOG_BLOOD_TYPES)

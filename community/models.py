@@ -51,3 +51,11 @@ class Comment(models.Model):
     content = models.CharField(max_length=150)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+class Recomment(models.Model):
+    id = models.AutoField(primary_key=True)
+    comment = models.ForeignKey(Comment, null=False, blank=False, on_delete=models.CASCADE, related_name='recomments')
+    writer = models.ForeignKey(User, on_delete=models.CASCADE)
+    content = models.CharField(max_length=150)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
