@@ -146,18 +146,42 @@ class CommentReCommentViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mi
     queryset = Recomment.objects.all()
     serializer_class = RecommentSerializer
 
-    def list(self, request, comment_id=None):
-        post = get_object_or_404(Comment, id=comment_id)
+    def list(self, request, post_id=None, comment_id=None):
+        post = get_object_or_404(Post, id=post_id)
+        comment = get_object_or_404(Comment, id=comment_id, post=post)
         queryset = self.filter_queryset(self.get_queryset().filter(comment=comment))
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
     
-    def create(self, request, comment_id=None):
-        comment = get_object_or_404(Comment, id=comment_id)
+    def create(self, request, post_id=None, comment_id=None):
+        post = get_object_or_404(Post, id=post_id)
+        comment = get_object_or_404(Comment, id=comment_id, post=post)
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save(comment=comment, writer=self.request.user)
         return Response(serializer.data)
+    def retrieve(self, request, post_id=None, comment_id=None, pk=None):
+        post = get_object_or_404(Post, id=post_id)
+        comment = get_object_or_404(Comment, id=comment_id, post=post)
+        recomment = get_object_or_404(Recomment, id=pk, comment=comment)
+        serializer = self.get_serializer(recomment)
+        return Response(serializer.data)
+    
+    def update(self, request, post_id=None, comment_id=None, pk=None):
+        post = get_object_or_404(Post, id=post_id)
+        comment = get_object_or_404(Comment, id=comment_id, post=post)
+        recomment = get_object_or_404(Recomment, id=pk, comment=comment)
+        serializer = self.get_serializer(recomment, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
+    def destroy(self, request, post_id=None, comment_id=None, pk=None):
+        post = get_object_or_404(Post, id=post_id)
+        comment = get_object_or_404(Comment, id=comment_id, post=post)
+        recomment = get_object_or_404(Recomment, id=pk, comment=comment)
+        recomment.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 class LikePostViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.DestroyModelMixin):
     queryset = Post.objects.all()
