@@ -112,16 +112,16 @@ class CommentSerializer(serializers.ModelSerializer):
     writer = serializers.SerializerMethodField(read_only = True)
     def get_writer(self, instance):
         return instance.writer.username
-    '''
+    
     recomments = serializers.SerializerMethodField(read_only=True)
     def get_recomments(self, instance):
         serializer = RecommentSerializer(instance.recomments, many=True)
         return serializer.data
-    '''
+    
     
     class Meta:
         model = Comment
-        fields = '__all__'
+        fields = ['id','post','writer','content','recomments','created_at','updated_at']
         read_only_fields = ['id', 'post', 'writer']
 
 class RecommentSerializer(serializers.ModelSerializer):
