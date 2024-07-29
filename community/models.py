@@ -36,7 +36,9 @@ class Post(models.Model):
     ]
     blood = models.CharField(max_length=30, choices=DOG_BLOOD_TYPES, default='혈액형')
     
-    image = models.ImageField(upload_to=image_upload_path, blank=True, null=True)
+    image_1 = models.ImageField(upload_to=image_upload_path, blank=True, null=True)
+    image_2 = models.ImageField(upload_to=image_upload_path, blank=True, null=True)
+    image_3 = models.ImageField(upload_to=image_upload_path, blank=True, null=True)
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
