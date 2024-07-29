@@ -59,6 +59,11 @@ class PostSerializer(serializers.ModelSerializer):
         serializer = CommentSerializer(instance.comments, many=True)
         return serializer.data
 
+    comments_cnt = serializers.SerializerMethodField()
+
+    def get_comments_cnt(self, instance):
+        return instance.comments.count()
+
     def validate(self, data):
         if 'blood' not in data or not data['blood']:
             raise serializers.ValidationError({"blood": "Blood type is required."})
@@ -72,7 +77,10 @@ class PostSerializer(serializers.ModelSerializer):
         likes = instance.like.all()
         return [like.username for like in likes]
     
-    image = serializers.ImageField(use_url=True, required=False)
+    image_1 = serializers.ImageField(use_url=True, required=False)
+    image_2 = serializers.ImageField(use_url=True, required=False)
+    image_3 = serializers.ImageField(use_url=True, required=False)
+    
     
     class Meta:
         model = Post
@@ -82,6 +90,7 @@ class PostSerializer(serializers.ModelSerializer):
             'writer',
             'created_at',
             'updated_at',
+            'comments_cnt',
             'like_num',
         ]
 
