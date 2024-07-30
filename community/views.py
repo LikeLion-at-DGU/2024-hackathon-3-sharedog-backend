@@ -61,6 +61,22 @@ class PostViewSet(viewsets.ModelViewSet):
             like_post.save()
         return Response()
     
+    @action(methods=['POST'], detail=False)
+    def like_post(self, request):
+        post_id = request.data.get('post_id')
+        try:
+            like_post = Post.objects.get(pk=post_id)
+            if request.user in like_post.like.all():
+                like_post.like.remove(request.user)
+                like_post.like_num -= 1
+            else:
+                like_post.like.add(request.user)
+                like_post.like_num += 1
+            like_post.save()
+            return Response({'like_num': like_post.like_num}, status=status.HTTP_200_OK)
+        except Post.DoesNotExist:
+            return Response({'detail': '게시글을 찾을 수 없습니다.'}, status=status.HTTP_404_NOT_FOUND)
+    
     # 프론트에서 처리하는거인가봐...
     @action(methods=["GET"], detail=False)
     def filter_posts(self, request):

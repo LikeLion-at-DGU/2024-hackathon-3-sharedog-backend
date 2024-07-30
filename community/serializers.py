@@ -40,7 +40,7 @@ class PostListSerializer(serializers.ModelSerializer):
             'writer',
             'created_at',
             'updated_at',
-            'image',
+            'image_1',
             'comments_cnt',
             'like_num',
             'blood',
