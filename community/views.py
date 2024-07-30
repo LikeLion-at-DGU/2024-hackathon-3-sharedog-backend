@@ -5,8 +5,8 @@ from rest_framework import viewsets, mixins, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 
-from .models import Post, Comment
-from .serializers import PostListSerializer, PostSerializer, CommentSerializer
+from .models import Post, Comment, Recomment
+from .serializers import PostListSerializer, PostSerializer, CommentSerializer, CommentListSerializer, RecommentSerializer
 
 # Create your views here.
 
@@ -94,9 +94,45 @@ class PostViewSet(viewsets.ModelViewSet):
         serializer = PostSerializer(queryset, many=True)
         return Response(serializer.data)
 
-class CommentViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.DestroyModelMixin):
+class CommentViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.DestroyModelMixin):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
+    lookup_field = 'pk'
+
+    def perform_create(self, serializer):
+        post_id = self.kwargs.get('post_id')  # URL에서 post_id를 가져옵니다.
+        post = get_object_or_404(Post, id=post_id)  # 해당 post_id로 Post 객체를 가져옵니다.
+        serializer.save(writer=self.request.user, post=post) 
+    
+    @action(methods=['GET'], detail=True, url_path='recomments')
+    def list_recomments(self, request, pk=None):
+        comment = get_object_or_404(Comment, id=pk)
+        recomments = Recomment.objects.filter(comment=comment)
+        serializer = RecommentSerializer(recomments, many=True)
+        return Response(serializer.data)
+
+    @action(methods=['POST'], detail=True)
+    def add_recomment(self, request, pk=None):
+        comment = get_object_or_404(Comment, id=pk)
+        serializer = RecommentSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(comment=comment, writer=self.request.user)
+        return Response(serializer.data)
+    '''
+    def list(self, request, comment_id=None):
+        comment = get_object_or_404(Comment, id=comment_id)
+        queryset = self.filter_queryset(self.get_queryset().filter(comment=comment))
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+    def create(self, request, comment_id=None):
+        comment = get_object_or_404(Comment, id=comment_id)
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(comment=comment)
+        return Response(serializer.data)
+    '''
+    
 
 class PostCommentViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.CreateModelMixin):
     queryset = Comment.objects.all()
@@ -115,6 +151,54 @@ class PostCommentViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.
         serializer.save(post=post, writer=self.request.user)
         return Response(serializer.data)
     
+    def perform_create(self, serializer):
+        serializer.save(writer=self.request.user)
+    
+class RecommentViewSet(viewsets.GenericViewSet,mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.DestroyModelMixin):
+    queryset = Recomment.objects.all()
+    serializer_class = RecommentSerializer
+
+class CommentReCommentViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.CreateModelMixin):
+    queryset = Recomment.objects.all()
+    serializer_class = RecommentSerializer
+
+    def list(self, request, post_id=None, comment_id=None):
+        post = get_object_or_404(Post, id=post_id)
+        comment = get_object_or_404(Comment, id=comment_id, post=post)
+        queryset = self.filter_queryset(self.get_queryset().filter(comment=comment))
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+    
+    def create(self, request, post_id=None, comment_id=None):
+        post = get_object_or_404(Post, id=post_id)
+        comment = get_object_or_404(Comment, id=comment_id, post=post)
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(comment=comment, writer=self.request.user)
+        return Response(serializer.data)
+    def retrieve(self, request, post_id=None, comment_id=None, pk=None):
+        post = get_object_or_404(Post, id=post_id)
+        comment = get_object_or_404(Comment, id=comment_id, post=post)
+        recomment = get_object_or_404(Recomment, id=pk, comment=comment)
+        serializer = self.get_serializer(recomment)
+        return Response(serializer.data)
+    
+    def update(self, request, post_id=None, comment_id=None, pk=None):
+        post = get_object_or_404(Post, id=post_id)
+        comment = get_object_or_404(Comment, id=comment_id, post=post)
+        recomment = get_object_or_404(Recomment, id=pk, comment=comment)
+        serializer = self.get_serializer(recomment, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
+    def destroy(self, request, post_id=None, comment_id=None, pk=None):
+        post = get_object_or_404(Post, id=post_id)
+        comment = get_object_or_404(Comment, id=comment_id, post=post)
+        recomment = get_object_or_404(Recomment, id=pk, comment=comment)
+        recomment.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 class LikePostViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.DestroyModelMixin):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
@@ -124,7 +208,7 @@ class LikePostViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.Ret
         queryset = self.filter_queryset(self.get_queryset().filter(like=user))
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
-    
+'''
 class UserCommentViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.DestroyModelMixin):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
@@ -140,3 +224,4 @@ class UserCommentViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.
         serializer = PostSerializer(posts, many=True)
         
         return Response(serializer.data)
+'''

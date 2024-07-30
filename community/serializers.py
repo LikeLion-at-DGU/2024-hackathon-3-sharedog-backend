@@ -94,6 +94,24 @@ class PostSerializer(serializers.ModelSerializer):
             'like_num',
         ]
 
+class CommentListSerializer(serializers.ModelSerializer):
+    recomments_cnt = serializers.SerializerMethodField()
+
+    def get_recomments_cnt(self, instance):
+        return instance.recomments.count()
+    
+    content = serializers.SerializerMethodField()
+    def get_content(self, instance):
+        return instance.content[:40]
+
+    writer = serializers.SerializerMethodField(read_only=True)
+    def get_writer(self, instance):
+        return instance.writer.username
+
+    class Meta:
+        model = Comment
+        fields = '__all__'
+
 class CommentSerializer(serializers.ModelSerializer):
     post = serializers.SerializerMethodField(read_only = True)
     def get_post(self, instance):
@@ -104,7 +122,28 @@ class CommentSerializer(serializers.ModelSerializer):
     def get_writer(self, instance):
         return instance.writer.username
     
+    recomments = serializers.SerializerMethodField(read_only=True)
+    def get_recomments(self, instance):
+        serializer = RecommentSerializer(instance.recomments, many=True)
+        return serializer.data
+    
+    
     class Meta:
         model = Comment
+        fields = ['id','post','writer','content','recomments','created_at','updated_at']
+        read_only_fields = ['id', 'post', 'writer']
+
+class RecommentSerializer(serializers.ModelSerializer):
+    comment = serializers.SerializerMethodField(read_only = True)
+    def get_comment(self, instance):
+        comment = instance.comment
+        return comment.id
+    
+    writer = serializers.SerializerMethodField(read_only=True)
+    def get_writer(self, instance):
+        return instance.writer.username
+
+    class Meta:
+        model = Recomment
         fields = '__all__'
-        read_only_fields = ['post', 'writer']
+        read_only_fields = ['id','comment', 'writer']
