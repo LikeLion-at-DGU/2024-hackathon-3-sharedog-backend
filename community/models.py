@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 
 # Create your models here.
 def image_upload_path(instance, filename):
-    return f'{instance.id}/{filename}'
+    return f'{filename}'
 
 class Post(models.Model):
     id = models.AutoField(primary_key=True)
