@@ -30,9 +30,14 @@ class PostListSerializer(serializers.ModelSerializer):
             return f"{int(time_difference.total_seconds() // 3600)}시간 전"
         else:
             return f"{time_difference.days}일 전"
-        
+    def get_image_url(self, obj):
+        request = self.context.get('request')
+        if request and obj.image_1:
+            return request.build_absolute_uri(obj.image_1.url)
+        return None
+    
     image_1 = serializers.ImageField(use_url=True, required=False)
-
+    
     class Meta:
         model = Post
         fields = [

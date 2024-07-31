@@ -77,23 +77,6 @@ class PostViewSet(viewsets.ModelViewSet):
         except Post.DoesNotExist:
             return Response({'detail': '게시글을 찾을 수 없습니다.'}, status=status.HTTP_404_NOT_FOUND)
     
-    # 프론트에서 처리하는거인가봐...
-    @action(methods=["GET"], detail=False)
-    def filter_posts(self, request):
-        region = request.query_params.get('region', None)
-        blood = request.query_params.get('blood', None)
-        
-        queryset = self.get_queryset()
-        
-        if region:
-            queryset = queryset.filter(region=region)
-        
-        if blood:
-            queryset = queryset.filter(blood=blood)
-        
-        serializer = PostSerializer(queryset, many=True)
-        return Response(serializer.data)
-    
     @action(methods=["GET"], detail=False, url_path='region/(?P<region>[^/.]+)')
     def filter_by_region(self, request, region=None):
         queryset = self.get_queryset().filter(region=region)
@@ -119,7 +102,7 @@ class PostViewSet(viewsets.ModelViewSet):
         if blood:
             queryset = queryset.filter(blood=blood)
         
-        serializer = PostListSerializer(queryset, many=True)
+        serializer = PostListSerializer(queryset, many=True, context={'request':request})
         return Response(serializer.data)
 
 class CommentViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.DestroyModelMixin):
