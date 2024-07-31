@@ -48,6 +48,37 @@ class PostViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(writer=self.request.user)
     
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        try:
+            serializer.is_valid(raise_exception=True)
+        except ValidationError as e:
+            return Response(e.detail, status=status.HTTP_400_BAD_REQUEST)
+
+        # 요청 데이터에 새로운 사진이 포함되지 않은 경우 기존 사진을 유지
+        if 'image_1' not in request.data:
+            data = serializer.validated_data
+            data['image_1'] = instance.image_1
+        
+        if 'image_2' not in request.data:
+            data = serializer.validated_data
+            data['image_2'] = instance.image_2
+
+        if 'image_3' not in request.data:
+            data = serializer.validated_data
+            data['image_3'] = instance.image_3
+
+        self.perform_update(serializer)
+
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_200_OK, headers=headers)
+
+    def perform_update(self, serializer):
+        serializer.save()
+
+
     @action(methods=['POST'], detail=True)
     def likes(self, request, pk=None):
         like_post = self.get_object()
