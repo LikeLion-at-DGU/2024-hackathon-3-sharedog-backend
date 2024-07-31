@@ -93,6 +93,34 @@ class PostViewSet(viewsets.ModelViewSet):
         
         serializer = PostSerializer(queryset, many=True)
         return Response(serializer.data)
+    
+    @action(methods=["GET"], detail=False, url_path='region/(?P<region>[^/.]+)')
+    def filter_by_region(self, request, region=None):
+        queryset = self.get_queryset().filter(region=region)
+        serializer = PostListSerializer(queryset, many=True)
+        return Response(serializer.data)
+    
+    @action(methods=["GET"], detail=False, url_path='blood/(?P<blood>.+)')
+    def filter_by_blood(self, request, blood=None):
+        queryset = self.get_queryset().filter(blood=blood)
+        serializer = PostListSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+    @action(methods=["GET"], detail=False, url_path='filter')
+    def filter_by_region_and_blood(self, request):
+        region = request.query_params.get('region', None)
+        blood = request.query_params.get('blood', None)
+        
+        queryset = self.get_queryset()
+        
+        if region:
+            queryset = queryset.filter(region=region)
+        
+        if blood:
+            queryset = queryset.filter(blood=blood)
+        
+        serializer = PostListSerializer(queryset, many=True)
+        return Response(serializer.data)
 
 class CommentViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.DestroyModelMixin):
     queryset = Comment.objects.all()
