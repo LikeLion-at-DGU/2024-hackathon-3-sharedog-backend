@@ -19,18 +19,19 @@ class DogProfile(models.Model):
 
     id = models.AutoField(primary_key=True)
     dogname = models.CharField(max_length=40)
-
-    GENDER_M = "male"
-    GENDER_N = "neutered"
-    GENDER_F = "female"
+    
+    GENDER_M = "수컷"
+    GENDER_N = "중성화"
+    GENDER_F = "암컷"
     GENDER_CHOICES = (
-        (GENDER_M, "Male"),
-        (GENDER_N, "Neutered"),
-        (GENDER_F, "Female"),
+        (GENDER_M, "수컷"),
+        (GENDER_N, "중성화"),
+        (GENDER_F, "암컷"),
     )
+    
     gender = models.CharField(choices=GENDER_CHOICES, max_length=10, blank=True)
     dog_age = models.IntegerField()
-    dog_weight = models.IntegerField()
+    dog_weight = models.CharField(max_length=50)
     DOG_BLOOD_TYPES = [
         ('DEA 1-', 'DEA 1-'),
         ('DEA 1.1', 'DEA 1.1'),
