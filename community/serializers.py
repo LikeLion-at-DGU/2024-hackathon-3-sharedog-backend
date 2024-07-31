@@ -31,6 +31,8 @@ class PostListSerializer(serializers.ModelSerializer):
         else:
             return f"{time_difference.days}일 전"
         
+    image_1 = serializers.ImageField(use_url=True, required=False)
+
     class Meta:
         model = Post
         fields = [
