@@ -81,7 +81,6 @@ class PostSerializer(serializers.ModelSerializer):
     image_2 = serializers.ImageField(use_url=True, required=False)
     image_3 = serializers.ImageField(use_url=True, required=False)
     
-    
     class Meta:
         model = Post
         fields = '__all__'
