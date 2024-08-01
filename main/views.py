@@ -1,8 +1,11 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, mixins, status
 from .models import Sizetest, Agetest, Weighttest, Vaccinetest, Diseasetest, Totaltest
-from .serializers import SizetestSerializer, AgetestSerializer, WeighttestSerializer, VaccinetestSerializer, DiseasetestSerializer, TotaltestSerializer
+from accounts.models import *
+from community.models import *
+from .serializers import SizetestSerializer, AgetestSerializer, WeighttestSerializer, VaccinetestSerializer, DiseasetestSerializer, TotaltestSerializer, ProfileSerializer, DogProfileSerializer,PostSerializer
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 class SizetestViewSet(viewsets.ModelViewSet):
     queryset = Sizetest.objects.all()
@@ -83,7 +86,25 @@ class DiseasetestViewSet(viewsets.ModelViewSet):
             has_disease=disease_instance
         )
         
-
 class TotaltestViewSet(viewsets.ModelViewSet):
     queryset = Totaltest.objects.all()
     serializer_class = TotaltestSerializer
+
+class MainAPIView(APIView):
+    def get(self, request):
+        profiles = Profile.objects.all()
+        #dogprofiles = DogProfile.objects.all()
+        posts = Post.objects.all()
+
+        profiles_data = ProfileSerializer(profiles, many=True).data
+        #dogprofiles_data = DogProfileSerializer(dogprofiles, many=True).data
+        posts_data = PostSerializer(posts, many=True).data
+
+        data = {
+            'profiles': profiles_data,
+            #'dogprofiles': dogprofiles_data,
+            'posts': posts_data,
+        }
+        return Response(data)
+    
+    

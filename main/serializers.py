@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import *
-
+from accounts.models import *
+from community.models import *
 class SizetestSerializer(serializers.ModelSerializer):
 
     writer = serializers.SerializerMethodField(read_only=True)
@@ -67,3 +68,21 @@ class TotaltestSerializer(serializers.ModelSerializer):
     class Meta:
         model = Totaltest
         fields = '__all__'
+
+
+
+class DogProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DogProfile
+        fields = ['id','dogname']
+
+class ProfileSerializer(serializers.ModelSerializer):
+    dogs = DogProfileSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Profile
+        fields = ['id','name','image','dogs']
+class PostSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Post
+        fields = ['id','blood','region','title','content','image_1','created_at']

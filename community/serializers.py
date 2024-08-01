@@ -163,10 +163,16 @@ class CommentSerializer(serializers.ModelSerializer):
         else:
             return f"{time_difference.days}일 전"
         
+    #profile_image = serializers.ImageField(source='profile.imgae')
+        
     class Meta:
         model = Comment
-        fields = ['id','post','writer','content','recomments','created_at','updated_at']
-        read_only_fields = ['id', 'post', 'writer']
+        fields = ['id','post','writer',
+                #'profile_image',
+                'content','recomments','created_at','updated_at']
+        read_only_fields = ['id', 'post', 'writer',
+                            #'profile_image'
+                            ]
 
 class RecommentSerializer(serializers.ModelSerializer):
     comment = serializers.SerializerMethodField(read_only = True)
@@ -178,7 +184,13 @@ class RecommentSerializer(serializers.ModelSerializer):
     def get_writer(self, instance):
         return instance.writer.username
 
+    #profile_iamge = serializers.ImageField(source='profile.imgae')
+
     class Meta:
         model = Recomment
-        fields = '__all__'
-        read_only_fields = ['id','comment', 'writer']
+        fields = ['id','comment','writer','content','created_at','updated_at',
+                #'profile_iamge'
+                ]
+        read_only_fields = ['id','comment', 'writer',
+                            #'profile_image'
+                            ]
