@@ -75,7 +75,7 @@ class DogProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = DogProfile
         fields = ['id','dogname']
-
+        
 class ProfileSerializer(serializers.ModelSerializer):
     dogs = DogProfileSerializer(many=True, read_only=True)
 
@@ -83,6 +83,15 @@ class ProfileSerializer(serializers.ModelSerializer):
         model = Profile
         fields = ['id','name','image','dogs']
 class PostSerializer(serializers.ModelSerializer):
+
+    image_1 = serializers.SerializerMethodField() 
     class Meta:
         model = Post
         fields = ['id','blood','region','title','content','image_1','created_at']
+
+    def get_image_1(self, obj):
+        request = self.context.get('request')
+        if request and obj.image_1:
+            # 절대 URL 생성
+            return request.build_absolute_uri(obj.image_1.url)
+        return None

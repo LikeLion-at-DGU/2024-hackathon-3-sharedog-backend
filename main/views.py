@@ -94,11 +94,11 @@ class MainAPIView(APIView):
     def get(self, request):
         profiles = Profile.objects.all()
         #dogprofiles = DogProfile.objects.all()
-        posts = Post.objects.all()
+        posts = Post.objects.filter(region='서울').order_by('-created_at')[:2]
 
-        profiles_data = ProfileSerializer(profiles, many=True).data
+        profiles_data = ProfileSerializer(profiles, many=True, context={'request': request}).data
         #dogprofiles_data = DogProfileSerializer(dogprofiles, many=True).data
-        posts_data = PostSerializer(posts, many=True).data
+        posts_data = PostSerializer(posts, many=True, context={'request': request}).data
 
         data = {
             'profiles': profiles_data,
@@ -106,5 +106,4 @@ class MainAPIView(APIView):
             'posts': posts_data,
         }
         return Response(data)
-    
     
