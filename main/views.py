@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, mixins, status
+from rest_framework.decorators import action
 from .models import Sizetest, Agetest, Weighttest, Vaccinetest, Diseasetest, Totaltest
 from accounts.models import *
 from community.models import *
@@ -107,3 +108,21 @@ class MainAPIView(APIView):
         }
         return Response(data)
     
+class PostViewSet(viewsets.ModelViewSet):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+
+    @action(methods=["GET"], detail=False, url_path='region/(?P<region>[^/.]+)')
+    def filter_by_region(self, request, region=None):
+        queryset = self.get_queryset()
+
+        # URL 경로에서 'region' 값을 받아와서 필터링합니다.
+        if region is not None:
+            queryset = queryset.filter(region=region)
+
+        # 'created_at' 필드로 내림차순 정렬하고, 최근 두 개의 게시물만 가져옵니다.
+        queryset = queryset.order_by('-created_at')[:2]
+
+        # 필터링된 결과를 직렬화합니다.
+        serializer = PostSerializer(queryset, many=True)
+        return Response(serializer.data)
