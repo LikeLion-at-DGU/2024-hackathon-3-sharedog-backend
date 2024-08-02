@@ -13,4 +13,6 @@ default_router.register("dogprofiles",DogProfileViewSet, basename="dogprofiles")
 
 urlpatterns = [
     path("",include(default_router.urls)),
+    path('', include('dj_rest_auth.urls')),
+    path('registration', include('dj_rest_auth.registration.urls'))
 ] + static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)

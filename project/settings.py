@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 import environ, os
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -48,6 +49,13 @@ INSTALLED_APPS = [
     'users',
 
     'rest_framework',
+    'rest_framework_simplejwt',
+    'rest_framework.authtoken',
+    'dj_rest_auth',
+    'dj_rest_auth.registration',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
     'corsheaders',
 ]
 
@@ -62,6 +70,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
 ROOT_URLCONF = 'project.urls'
@@ -155,3 +165,33 @@ CORS_ALLOWED_ORIGINS = [
     'http://프론트주소',
     'http://프론트주소:포트번호',
 ]
+
+REST_AUTH = {
+    'USE_JWT' : True,
+    'JWT_AUTH_HTTPONLY' : True,
+    'JWT_AUTH_COOKIE' : 'access_token',
+    'JWT_AUTH_REFRESH_COOKIE' : 'refresh_token',
+    'JWT_AUTH_COOKIE_USE_CSRF' : True,
+    'SESSION_LOGIN' : False
+}
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
+    )
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME' : timedelta(hours=2),
+    'REFRESH_TOKEN_LIFETIME' : timedelta(days=14),
+    'ROTATE_REFRESH_TOKENS': False,
+    'TOKEN_USER_CLASS' : 'django.contrib.auth.models.User'
+}
+
+SITE_ID = 1
+ACCOUNT_USER_MODEL_USERNAME_FIELD = 'username'
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USERNAME_REQUIRED = True
+ACCOUNT_AUTHENTICATION_METHOD = 'username'
+
+ACCOUNT_EMAIL_VERIFICATION = 'none'
