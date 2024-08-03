@@ -22,9 +22,8 @@ from .serializers import *
 
 User = get_user_model()
 
-# local에서 할 때는 baseurl 바꾸기
 # BASE_URL = "http://localhost:8000/"
-BASE_URL = "http://15.164.36.40/" 
+BASE_URL = "http://15.164.36.40/"
 KAKAO_CALLBACK_URI = BASE_URL + 'api/accounts/kakao/callback/'
 
 @api_view(["GET"])
@@ -72,28 +71,27 @@ def kakao_callback(request):
             "profile_image": kakao_account.get("profile", {}).get("profile_image_url"),
         }
         nickname = kakao_account.get("profile", {}).get("nickname")
-        # profile = kakao_account.get("profile", {}).get("profile_image_url")
-        print(nickname)
-        # print(profile)
+
         # Signup or Signin
         user, created = User.objects.get_or_create(email=email)
         if created:
             user.username = nickname
             user.save()
 
-        # Save the Kakao access token in SocialAccount (Optional)
-        social_account, created = SocialAccount.objects.update_or_create(
-            provider='kakao',
-            uid=email,  # Using email as uid for simplicity, or use a more appropriate field
-            defaults={'user': user, 'extra_data': {'access_token': access_token}}
-        )
-
+        #수정해야함(session)
+        django_login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+        ##
         
         # Generate JWT token
         refresh = RefreshToken.for_user(user)
         jwt_access_token = refresh.access_token 
         
         # Save the Kakao access token in SocialAccount (Optional)
+        social_account, _ = SocialAccount.objects.get_or_create(user=user, provider='kakao')
+        if not created:
+            # 이미 존재하는 경우, 액세스 토큰 업데이트
+            access_token = token_req_json.get("access_token")
+            refresh_token = token_req_json.get("refresh_token")
         response_data = {
             "message": "Success",
             "profile_info": profile_info,
@@ -122,7 +120,7 @@ def logout(request):
     access_token = None
     
     # Fetch the user's Kakao access token
-    access_token = request.COOKIES.get('access_token')
+    access_token = request.COOKIES.get('jwt_access_token')
     refresh_token = request.COOKIES.get('refresh_token')
     
     if access_token:
@@ -133,8 +131,9 @@ def logout(request):
         # 리프레시 토큰을 블랙리스트에 추가합니다.
         BlacklistedToken.objects.create(token=refresh_token)
 
+    django_logout(request)
     response = JsonResponse({"message": "Successfully logged out"})
-    response.delete_cookie('access_token')
+    response.delete_cookie('jwt_access_token')
     response.delete_cookie('refresh_token')  # If you're using refresh tokens in cookies
     response.delete_cookie('sessionid')  # Delete the sessionid cookie
     return response
@@ -153,12 +152,3 @@ class DogProfileViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save()
-
-@api_view(["GET"])
-@permission_classes([IsAuthenticated])
-def get_user_info(request):
-    user = request.user
-    return Response({
-        "username": user.username,
-        "email": user.email
-    })
