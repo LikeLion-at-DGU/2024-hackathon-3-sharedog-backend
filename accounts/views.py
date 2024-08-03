@@ -72,14 +72,14 @@ def kakao_callback(request):
             "profile_image": kakao_account.get("profile", {}).get("profile_image_url"),
         }
         nickname = kakao_account.get("profile", {}).get("nickname")
-        profile = kakao_account.get("profile", {}).get("profile_image_url")
+        # profile = kakao_account.get("profile", {}).get("profile_image_url")
         print(nickname)
-        print(profile)
+        # print(profile)
         # Signup or Signin
         user, created = User.objects.get_or_create(email=email)
         if created:
             user.username = nickname
-            user.profile = profile
+            # user.profile = profile
             user.save()
         print('확인')
 
