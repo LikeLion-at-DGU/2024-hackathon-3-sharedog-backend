@@ -98,7 +98,7 @@ def kakao_callback(request):
             "access_token": str(jwt_access_token),
             "refresh_token": str(refresh),
         }
-        response = JsonResponse(response_data)
+        response = redirect('http://localhost:5173/signuppet')
         cookie_max_age = 3600 * 24 * 14  # 14 days
         response.set_cookie('access_token', str(jwt_access_token), max_age=3600, httponly=True, samesite='Lax')
         response.set_cookie('refresh_token', str(refresh), max_age=cookie_max_age, httponly=True, samesite='Lax')
