@@ -11,7 +11,9 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
-import environ, os
+from django.conf import settings
+import environ, os, json, sys
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -28,6 +30,8 @@ SECRET_KEY = env('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env('DEBUG')
 
+KAKAO_REST_API_KEY = env('KAKAO_REST_API_KEY')
+
 ALLOWED_HOSTS = ['*']
 
 
@@ -40,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
 
     'accounts',
     'community',
@@ -48,7 +53,18 @@ INSTALLED_APPS = [
     'users',
 
     'rest_framework',
+    'rest_framework_simplejwt',
+    'rest_framework.authtoken',
+    'dj_rest_auth',
+    'dj_rest_auth.registration',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.kakao',
     'corsheaders',
+
+    #추가됨
+    'rest_framework_simplejwt.token_blacklist',
 ]
 
 MIDDLEWARE = [
@@ -62,7 +78,16 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    'allauth.account.middleware.AccountMiddleware',
 ]
+
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+    # 주석 풀기
+    'allauth.account.auth_backends.AuthenticationBackend',
+    # 'accounts.authentication.TokenAuthentication'
+)
 
 ROOT_URLCONF = 'project.urls'
 
@@ -155,3 +180,40 @@ CORS_ALLOWED_ORIGINS = [
     'http://프론트주소',
     'http://프론트주소:포트번호',
 ]
+
+REST_AUTH = {
+    'USE_JWT' : True,
+    'JWT_AUTH_COOKIE' : 'access',
+    'JWT_AUTH_HTTPONLY' : True,
+    'JWT_AUTH_REFRESH_COOKIE' : 'refresh_token',
+    'JWT_AUTH_COOKIE_USE_CSRF' : False,
+    'SESSION_LOGIN' : False,
+}
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        # 주석 풀기
+        # 'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
+        # 'accounts.authentication.CustomJWTAuthentication',
+    ),
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'UPDATE_LAST_LOGIN': False,
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': SECRET_KEY,
+    'AUTH_HEADER_TYPES': ('Bearer',),
+}
+SITE_ID = 1
+ACCOUNT_USER_MODEL_USERNAME_FIELD = 'username'
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USERNAME_REQUIRED = True
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+
+AUTH_USER_MODEL = 'accounts.User'

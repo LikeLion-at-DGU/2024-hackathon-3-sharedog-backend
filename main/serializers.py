@@ -76,12 +76,12 @@ class DogProfileSerializer(serializers.ModelSerializer):
         model = DogProfile
         fields = ['id','dogname']
         
-class ProfileSerializer(serializers.ModelSerializer):
-    dogs = DogProfileSerializer(many=True, read_only=True)
+# class ProfileSerializer(serializers.ModelSerializer):
+#     dogs = DogProfileSerializer(many=True, read_only=True)
 
-    class Meta:
-        model = Profile
-        fields = ['id','name','image','dogs']
+#     class Meta:
+#         model = Profile
+#         fields = ['id','name','image','dogs']
 class PostSerializer(serializers.ModelSerializer):
 
     image_1 = serializers.SerializerMethodField() 
