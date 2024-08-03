@@ -22,7 +22,9 @@ from .serializers import *
 
 User = get_user_model()
 
-BASE_URL = "http://localhost:8000/"
+# local에서 할 때는 baseurl 바꾸기
+BASE_URL = "http://localhost:8000/" 
+# BASE_URL = "http://52.79.63.140/" 
 KAKAO_CALLBACK_URI = BASE_URL + 'api/accounts/kakao/callback/'
 
 @api_view(["GET"])
