@@ -22,7 +22,8 @@ from .serializers import *
 
 User = get_user_model()
 
-BASE_URL = "http://localhost:8000/"
+# BASE_URL = "http://localhost:8000/"
+BASE_URL = "http://15.164.36.40/"
 KAKAO_CALLBACK_URI = BASE_URL + 'api/accounts/kakao/callback/'
 
 @api_view(["GET"])
