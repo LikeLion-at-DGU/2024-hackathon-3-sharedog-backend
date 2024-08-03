@@ -79,9 +79,14 @@ def kakao_callback(request):
         user, created = User.objects.get_or_create(email=email)
         if created:
             user.username = nickname
-            # user.profile = profile
             user.save()
-        print('확인')
+
+        # Save the Kakao access token in SocialAccount (Optional)
+        social_account, created = SocialAccount.objects.update_or_create(
+            provider='kakao',
+            uid=email,  # Using email as uid for simplicity, or use a more appropriate field
+            defaults={'user': user, 'extra_data': {'access_token': access_token}}
+        )
 
         
         # Generate JWT token
@@ -89,9 +94,6 @@ def kakao_callback(request):
         jwt_access_token = refresh.access_token 
         
         # Save the Kakao access token in SocialAccount (Optional)
-        social_account, _ = SocialAccount.objects.get_or_create(user=user, provider='kakao')
-        social_account.extra_data['access_token'] = access_token
-        social_account.save()
         response_data = {
             "message": "Success",
             "profile_info": profile_info,
