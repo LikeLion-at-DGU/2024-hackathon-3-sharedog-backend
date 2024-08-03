@@ -1,7 +1,5 @@
 from rest_framework import viewsets
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework import viewsets
-from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework import status
 from django.http import JsonResponse
@@ -24,8 +22,7 @@ from .serializers import *
 
 User = get_user_model()
 
-# BASE_URL = "http://localhost:8000/"
-BASE_URL = "http://15.164.36.40"
+BASE_URL = "http://localhost:8000/"
 KAKAO_CALLBACK_URI = BASE_URL + 'api/accounts/kakao/callback/'
 
 @api_view(["GET"])
@@ -90,8 +87,10 @@ def kakao_callback(request):
         
         # Save the Kakao access token in SocialAccount (Optional)
         social_account, _ = SocialAccount.objects.get_or_create(user=user, provider='kakao')
-        social_account.extra_data['access_token'] = access_token
-        social_account.save()
+        if not created:
+            # 이미 존재하는 경우, 액세스 토큰 업데이트
+            access_token = token_req_json.get("access_token")
+            refresh_token = token_req_json.get("refresh_token")
         response_data = {
             "message": "Success",
             "profile_info": profile_info,
