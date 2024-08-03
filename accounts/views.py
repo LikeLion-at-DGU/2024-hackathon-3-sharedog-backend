@@ -42,14 +42,23 @@ class KakaoLogin(APIView):
             return Response({"error": "Email not provided by Kakao"}, status=status.HTTP_400_BAD_REQUEST)
 
         # 사용자 생성 또는 기존 사용자 가져오기
-        user, created = User.objects.get_or_create(username=email, defaults={"email": email})
+        try:
+            user, created = User.objects.get_or_create(username=email, defaults={"email": email})
 
-        if created:
-            user.set_unusable_password()
-            user.save()
+            if created:
+                user.set_unusable_password()
+                user.save()
+        except Exception as e:
+            print(f"Error creating user: {str(e)}")  # 추가된 로그
+            return Response({"error": "Error creating user"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+        
         # JWT 토큰 생성
-        refresh = RefreshToken.for_user(user)
+        try:
+            refresh = RefreshToken.for_user(user)
+        except Exception as e:
+            print(f"Error creating JWT token: {str(e)}")  # 추가된 로그
+            return Response({"error": "Error creating JWT token"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         return Response({
             "refresh": str(refresh),
             "access": str(refresh.access_token),
