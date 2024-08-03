@@ -23,8 +23,8 @@ from .serializers import *
 User = get_user_model()
 
 # local에서 할 때는 baseurl 바꾸기
-BASE_URL = "http://localhost:8000/" 
-# BASE_URL = "http://52.79.63.140/" 
+# BASE_URL = "http://localhost:8000/"
+BASE_URL = "http://15.164.36.40/" 
 KAKAO_CALLBACK_URI = BASE_URL + 'api/accounts/kakao/callback/'
 
 @api_view(["GET"])
@@ -72,13 +72,16 @@ def kakao_callback(request):
             "profile_image": kakao_account.get("profile", {}).get("profile_image_url"),
         }
         nickname = kakao_account.get("profile", {}).get("nickname")
-
+        profile = kakao_account.get("profile", {}).get("profile_image_url")
+        print(nickname)
+        print(profile)
         # Signup or Signin
         user, created = User.objects.get_or_create(email=email)
         if created:
             user.username = nickname
+            user.profile = profile
             user.save()
-
+        print('확인')
         #수정해야함(session)
         backend = 'django.contrib.auth.backends.ModelBackend'
         django_login(request, user, backend=backend)
