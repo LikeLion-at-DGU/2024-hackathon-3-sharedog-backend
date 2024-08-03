@@ -53,7 +53,7 @@ class Comment(models.Model):
     content = models.CharField(max_length=150)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    image = models.ForeignKey(Profile, null=True, related_name='comments', on_delete=models.CASCADE)
+    # image = models.ForeignKey(Profile, null=True, related_name='comments', on_delete=models.CASCADE)
 
 class Recomment(models.Model):
     id = models.AutoField(primary_key=True)
@@ -62,4 +62,4 @@ class Recomment(models.Model):
     content = models.CharField(max_length=150)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    image = models.ForeignKey(Profile, null=True, related_name='recomments', on_delete=models.CASCADE)
+    # image = models.ForeignKey(Profile, null=True, related_name='recomments', on_delete=models.CASCADE)
