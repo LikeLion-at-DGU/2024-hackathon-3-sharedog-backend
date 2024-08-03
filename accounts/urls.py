@@ -15,5 +15,5 @@ urlpatterns = [
     path('auth/kakao/', KakaoLogin.as_view(), name='kakao_login'),
     path('protected/', protected_view, name='protected_view'),
     path('', include('dj_rest_auth.urls')),
-    path('registration', include('dj_rest_auth.registration.urls'))
+    path('registration', include('dj_rest_auth.registration.urls')),
 ] + static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)

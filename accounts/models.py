@@ -1,4 +1,7 @@
+from django.conf import settings
 from django.db import models
+from django.utils.translation import gettext_lazy as _
+from django.contrib.auth.models import AbstractUser, BaseUserManager, Group, Permission
 
 # Create your models here.
 def image_upload_path(instance, filename):
@@ -19,7 +22,7 @@ class DogProfile(models.Model):
 
     id = models.AutoField(primary_key=True)
     dogname = models.CharField(max_length=40)
-    owner = models.ForeignKey(Profile, related_name='dogs', on_delete=models.CASCADE)
+    # owner = models.ForeignKey(Profile, related_name='dogs', on_delete=models.CASCADE)
     GENDER_M = "수컷"
     GENDER_N = "중성화"
     GENDER_F = "암컷"

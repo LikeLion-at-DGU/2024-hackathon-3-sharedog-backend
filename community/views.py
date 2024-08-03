@@ -4,14 +4,16 @@ from django.db.models import Q
 from rest_framework import viewsets, mixins, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
-
+from rest_framework.permissions import IsAuthenticated
+from django.contrib.auth import get_user_model
 from .models import Post, Comment, Recomment
 from .serializers import PostListSerializer, PostSerializer, CommentSerializer, CommentListSerializer, RecommentSerializer
 
 # Create your views here.
-
+User = get_user_model()
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
+    # permission_classes = [IsAuthenticated]
     
     def get_serializer_class(self):
         if self.action == "list":
@@ -46,7 +48,10 @@ class PostViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
     
     def perform_create(self, serializer):
-        serializer.save(writer=self.request.user)
+        user = self.request.user
+        serializer.save(writer=user)
+        user = self.request.user
+        serializer.save(writer=user)
     
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)

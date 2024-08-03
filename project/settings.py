@@ -11,7 +11,8 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
-import environ, os
+from django.conf import settings
+import environ, os, json, sys
 from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -29,6 +30,8 @@ SECRET_KEY = env('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env('DEBUG')
 
+KAKAO_REST_API_KEY = env('KAKAO_REST_API_KEY')
+
 ALLOWED_HOSTS = ['*']
 
 
@@ -41,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
 
     'accounts',
     'community',
@@ -56,6 +60,7 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
+    'allauth.socialaccount.providers.kakao',
     'corsheaders',
 ]
 
@@ -73,6 +78,8 @@ MIDDLEWARE = [
 
     'allauth.account.middleware.AccountMiddleware',
 ]
+
+
 
 ROOT_URLCONF = 'project.urls'
 
@@ -168,20 +175,25 @@ CORS_ALLOWED_ORIGINS = [
 
 REST_AUTH = {
     'USE_JWT' : True,
+    'JWT_AUTH_COOKIE' : 'access',
     'JWT_AUTH_HTTPONLY' : True,
-    'JWT_AUTH_COOKIE' : 'access_token',
     'JWT_AUTH_REFRESH_COOKIE' : 'refresh_token',
-    'JWT_AUTH_COOKIE_USE_CSRF' : True,
-    'SESSION_LOGIN' : False
+    'JWT_AUTH_COOKIE_USE_CSRF' : False,
+    'SESSION_LOGIN' : False,
 }
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
-    )
+        'rest_framework.authentication.SessionAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
 }
 
 SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'ROTATE_REFRESH_TOKENS': False,
@@ -199,6 +211,6 @@ SITE_ID = 1
 ACCOUNT_USER_MODEL_USERNAME_FIELD = 'username'
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = True
-ACCOUNT_AUTHENTICATION_METHOD = 'username'
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
 
-ACCOUNT_EMAIL_VERIFICATION = 'none'
+AUTH_USER_MODEL = 'accounts.User'

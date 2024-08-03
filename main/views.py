@@ -4,14 +4,14 @@ from rest_framework.decorators import action
 from .models import Sizetest, Agetest, Weighttest, Vaccinetest, Diseasetest, Totaltest
 from accounts.models import *
 from community.models import *
-from .serializers import SizetestSerializer, AgetestSerializer, WeighttestSerializer, VaccinetestSerializer, DiseasetestSerializer, TotaltestSerializer, ProfileSerializer, DogProfileSerializer,PostSerializer
+from .serializers import SizetestSerializer, AgetestSerializer, WeighttestSerializer, VaccinetestSerializer, DiseasetestSerializer, TotaltestSerializer, DogProfileSerializer,PostSerializer
 from rest_framework.response import Response
-from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
 
 class SizetestViewSet(viewsets.ModelViewSet):
     queryset = Sizetest.objects.all()
     serializer_class = SizetestSerializer
-
+    permission_classes = [IsAuthenticated]
     def create(self, request):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -91,22 +91,22 @@ class TotaltestViewSet(viewsets.ModelViewSet):
     queryset = Totaltest.objects.all()
     serializer_class = TotaltestSerializer
 
-class MainAPIView(APIView):
-    def get(self, request):
-        profiles = Profile.objects.all()
-        #dogprofiles = DogProfile.objects.all()
-        posts = Post.objects.filter(region='서울').order_by('-created_at')[:2]
+# class MainAPIView(APIView):
+#     def get(self, request):
+#         profiles = Profile.objects.all()
+#         #dogprofiles = DogProfile.objects.all()
+#         posts = Post.objects.filter(region='서울').order_by('-created_at')[:2]
 
-        profiles_data = ProfileSerializer(profiles, many=True, context={'request': request}).data
-        #dogprofiles_data = DogProfileSerializer(dogprofiles, many=True).data
-        posts_data = PostSerializer(posts, many=True, context={'request': request}).data
+#         profiles_data = ProfileSerializer(profiles, many=True, context={'request': request}).data
+#         #dogprofiles_data = DogProfileSerializer(dogprofiles, many=True).data
+#         posts_data = PostSerializer(posts, many=True, context={'request': request}).data
 
-        data = {
-            'profiles': profiles_data,
-            #'dogprofiles': dogprofiles_data,
-            'posts': posts_data,
-        }
-        return Response(data)
+#         data = {
+#             'profiles': profiles_data,
+#             #'dogprofiles': dogprofiles_data,
+#             'posts': posts_data,
+#         }
+#         return Response(data)
     
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
