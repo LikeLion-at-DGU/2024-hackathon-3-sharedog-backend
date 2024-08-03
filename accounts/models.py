@@ -5,14 +5,14 @@ def image_upload_path(instance, filename):
     return f'{instance.pk}/{filename}'
 
 
-class Profile(models.Model):
+# class Profile(models.Model):
     
-    id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=40)
-    image = models.ImageField(upload_to=image_upload_path, blank=True, null=True)
+#     id = models.AutoField(primary_key=True)
+#     name = models.CharField(max_length=40)
+#     image = models.ImageField(upload_to=image_upload_path, blank=True, null=True)
 
-    phone = models.CharField(max_length=40)
-    email = models.CharField(max_length=40)
+#     phone = models.CharField(max_length=40)
+#     email = models.CharField(max_length=40)
     
 
 class DogProfile(models.Model):
