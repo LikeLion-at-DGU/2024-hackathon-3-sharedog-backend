@@ -3,11 +3,12 @@ from rest_framework import viewsets, mixins, status
 from .models import Sizetest, Agetest, Weighttest, Vaccinetest, Diseasetest, Totaltest
 from .serializers import SizetestSerializer, AgetestSerializer, WeighttestSerializer, VaccinetestSerializer, DiseasetestSerializer, TotaltestSerializer
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 
 class SizetestViewSet(viewsets.ModelViewSet):
     queryset = Sizetest.objects.all()
     serializer_class = SizetestSerializer
-
+    permission_classes = [IsAuthenticated]
     def create(self, request):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
