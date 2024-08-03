@@ -1,142 +1,65 @@
 from rest_framework import viewsets
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
-from rest_framework import status
-from django.http import JsonResponse
-import requests
-from django.conf import settings
-from allauth.socialaccount.models import SocialAccount
-from django.contrib.auth import get_user_model
-from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework_simplejwt.tokens import RefreshToken
-from django.shortcuts import redirect
-from dj_rest_auth.registration.views import SocialLoginView
-from allauth.socialaccount.providers.kakao import views as kakao_view
-from allauth.socialaccount.providers.oauth2.client import OAuth2Client
-from django.contrib.auth import login as django_login
-from django.contrib.auth import logout as django_logout
-from django.contrib.auth.backends import ModelBackend
+from rest_framework.decorators import api_view
+from rest_framework import viewsets
+
 from .models import *
 from .serializers import *
 
+from django.shortcuts import get_list_or_404
+import requests
+from django.conf import settings
+from django.contrib.auth.models import User
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import api_view, permission_classes
 
-User = get_user_model()
 
-# BASE_URL = "http://localhost:8000/"
-BASE_URL = "http://15.164.36.40/"
-KAKAO_CALLBACK_URI = BASE_URL + 'api/accounts/kakao/callback/'
+class KakaoLogin(APIView):
+    def post(self, request):
+        access_token = request.data.get("access_token")
+        if not access_token:
+            return Response({"error": "No access token provided"}, status=status.HTTP_400_BAD_REQUEST)
 
-@api_view(["GET"])
-@permission_classes([AllowAny])
-def kakao_login(request):
-    rest_api_key = getattr(settings, 'KAKAO_REST_API_KEY')
-    return redirect(
-        f"https://kauth.kakao.com/oauth/authorize?client_id={rest_api_key}&redirect_uri={KAKAO_CALLBACK_URI}&response_type=code"
-    )
-
-@api_view(["GET"])
-@permission_classes([AllowAny])
-def kakao_callback(request):
-    rest_api_key = getattr(settings, 'KAKAO_REST_API_KEY')
-    code = request.GET.get("code")
-    
-    # Access Token Request
-    try:
-        token_req = requests.post(
-            "https://kauth.kakao.com/oauth/token",
-            data={
-                "grant_type": "authorization_code",
-                "client_id": rest_api_key,
-                "redirect_uri": KAKAO_CALLBACK_URI,
-                "code": code
-            }
-        )
-        token_req.raise_for_status()
-        token_req_json = token_req.json()
-        access_token = token_req_json.get("access_token")
-        refresh_token = token_req_json.get("refresh_token")
-
-        # Email Request
-        profile_request = requests.post(
+        # 카카오 API를 통해 사용자 정보 가져오기
+        kakao_response = requests.get(
             "https://kapi.kakao.com/v2/user/me",
-            headers={"Authorization": f"Bearer {access_token}"},
+            headers={"Authorization": f"Bearer {access_token}"}
         )
-        profile_request.raise_for_status()
-        profile_json = profile_request.json()
-        kakao_account = profile_json.get("kakao_account")
-        email = kakao_account.get("email")
-        profile_info = {
-            "email": email,
-            "nickname": kakao_account.get("profile", {}).get("nickname"),
-            "profile_image": kakao_account.get("profile", {}).get("profile_image_url"),
-        }
-        nickname = kakao_account.get("profile", {}).get("nickname")
 
-        # Signup or Signin
-        user, created = User.objects.get_or_create(email=email)
+        if kakao_response.status_code != 200:
+            return Response({"error": "Failed to fetch user info from Kakao"}, status=status.HTTP_400_BAD_REQUEST)
+
+        kakao_data = kakao_response.json()
+        kakao_id = kakao_data.get("id")
+        email = kakao_data.get("kakao_account", {}).get("email")
+
+        if not email:
+            return Response({"error": "Email not provided by Kakao"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # 사용자 생성 또는 기존 사용자 가져오기
+        user, created = User.objects.get_or_create(username=email, defaults={"email": email})
+
         if created:
-            user.username = nickname
+            user.set_unusable_password()
             user.save()
 
-        #수정해야함(session)
-        django_login(request, user, backend='django.contrib.auth.backends.ModelBackend')
-        ##
-        
-        # Generate JWT token
+        # JWT 토큰 생성
         refresh = RefreshToken.for_user(user)
-        jwt_access_token = refresh.access_token 
-        
-        # Save the Kakao access token in SocialAccount (Optional)
-        social_account, _ = SocialAccount.objects.get_or_create(user=user, provider='kakao')
-        if not created:
-            # 이미 존재하는 경우, 액세스 토큰 업데이트
-            access_token = token_req_json.get("access_token")
-            refresh_token = token_req_json.get("refresh_token")
-        response_data = {
-            "message": "Success",
-            "profile_info": profile_info,
-            "access_token": str(jwt_access_token),
-            "refresh_token": str(refresh),
-        }
-        response = redirect('http://localhost:5173/signuppet')
-        cookie_max_age = 3600 * 24 * 14  # 14 days
-        response.set_cookie('access_token', str(jwt_access_token), max_age=3600, httponly=True, samesite='Lax')
-        response.set_cookie('refresh_token', str(refresh), max_age=cookie_max_age, httponly=True, samesite='Lax')
-        return response
+        return Response({
+            "refresh": str(refresh),
+            "access": str(refresh.access_token),
+        }, status=status.HTTP_200_OK)
 
-    except requests.RequestException as e:
-        return JsonResponse({"err_msg": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-    except Exception as e:
-        return JsonResponse({"err_msg": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def protected_view(request):
+    return Response({"message": "This is a protected view"}, status=status.HTTP_200_OK)
 
-class KakaoLogin(SocialLoginView):
-    adapter_class = kakao_view.KakaoOAuth2Adapter
-    client_class = OAuth2Client
-    callback_url = "http://localhost:8080/login"
-
-@api_view(["POST"])
-
-def logout(request):
-    access_token = None
-    
-    # Fetch the user's Kakao access token
-    access_token = request.COOKIES.get('jwt_access_token')
-    refresh_token = request.COOKIES.get('refresh_token')
-    
-    if access_token:
-        # 액세스 토큰을 블랙리스트에 추가합니다.
-        BlacklistedToken.objects.create(token=access_token)
-    
-    if refresh_token:
-        # 리프레시 토큰을 블랙리스트에 추가합니다.
-        BlacklistedToken.objects.create(token=refresh_token)
-
-    django_logout(request)
-    response = JsonResponse({"message": "Successfully logged out"})
-    response.delete_cookie('jwt_access_token')
-    response.delete_cookie('refresh_token')  # If you're using refresh tokens in cookies
-    response.delete_cookie('sessionid')  # Delete the sessionid cookie
-    return response
 
 class DogProfileViewSet(viewsets.ModelViewSet):
     queryset = DogProfile.objects.all()
