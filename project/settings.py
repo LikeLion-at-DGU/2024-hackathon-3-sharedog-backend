@@ -86,7 +86,7 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
     # 주석 풀기
     'allauth.account.auth_backends.AuthenticationBackend',
-    # 'accounts.authentication.TokenAuthentication'
+    'accounts.authentication.TokenAuthentication'
 )
 
 ROOT_URLCONF = 'project.urls'
@@ -196,8 +196,8 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication',
         # 주석 풀기
-        # 'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
-        # 'accounts.authentication.CustomJWTAuthentication',
+        'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
+        'accounts.authentication.CustomJWTAuthentication',
     ),
 }
 

@@ -23,8 +23,8 @@ from .serializers import *
 User = get_user_model()
 
 # local에서 할 때는 baseurl 바꾸기
-# BASE_URL = "http://localhost:8000/"
-BASE_URL = "http://15.164.36.40/" 
+BASE_URL = "http://localhost:8000/"
+# BASE_URL = "http://15.164.36.40/" 
 KAKAO_CALLBACK_URI = BASE_URL + 'api/accounts/kakao/callback/'
 
 @api_view(["GET"])
@@ -82,10 +82,7 @@ def kakao_callback(request):
             user.profile = profile
             user.save()
         print('확인')
-        #수정해야함(session)
-        backend = 'django.contrib.auth.backends.ModelBackend'
-        django_login(request, user, backend=backend)
-        ##
+
         
         # Generate JWT token
         refresh = RefreshToken.for_user(user)
@@ -134,7 +131,6 @@ def logout(request):
         # 리프레시 토큰을 블랙리스트에 추가합니다.
         BlacklistedToken.objects.create(token=refresh_token)
 
-    django_logout(request)
     response = JsonResponse({"message": "Successfully logged out"})
     response.delete_cookie('access_token')
     response.delete_cookie('refresh_token')  # If you're using refresh tokens in cookies
