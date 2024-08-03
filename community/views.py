@@ -50,6 +50,8 @@ class PostViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         user = self.request.user
         serializer.save(writer=user)
+        user = self.request.user
+        serializer.save(writer=user)
     
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)

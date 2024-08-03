@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import AbstractUser, BaseUserManager, Group, Permission
@@ -44,6 +45,7 @@ class User(AbstractUser):
     username = models.CharField(max_length=50)
     email = models.EmailField(unique=True, max_length=255)
     nickname = models.CharField(max_length=50, null=True, blank=True)
+    profile = models.ImageField(upload_to=image_upload_path, null=True, blank=True)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
@@ -73,11 +75,12 @@ class BlacklistedToken(models.Model):
     token = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
 
+
 class DogProfile(models.Model):
 
     id = models.AutoField(primary_key=True)
     dogname = models.CharField(max_length=40)
-    
+    # owner = models.ForeignKey(Profile, related_name='dogs', on_delete=models.CASCADE)
     GENDER_M = "수컷"
     GENDER_N = "중성화"
     GENDER_F = "암컷"
@@ -89,7 +92,7 @@ class DogProfile(models.Model):
     
     gender = models.CharField(choices=GENDER_CHOICES, max_length=10, blank=True)
     dog_age = models.IntegerField()
-    dog_weight = models.CharField(max_length=50)
+    dog_weight = models.FloatField(max_length=50)
     DOG_BLOOD_TYPES = [
         ('DEA 1-', 'DEA 1-'),
         ('DEA 1.1', 'DEA 1.1'),

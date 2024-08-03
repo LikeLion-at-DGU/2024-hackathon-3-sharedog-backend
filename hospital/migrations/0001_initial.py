@@ -12,6 +12,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('accounts', '0001_initial'),
+        ('accounts', '0001_initial'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
@@ -37,6 +38,7 @@ class Migration(migrations.Migration):
                 ('time', models.TimeField()),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
+                ('dog', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='accounts.dogprofile')),
                 ('dog', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='accounts.dogprofile')),
                 ('hospital', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='reservations', to='hospital.hospital')),
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),

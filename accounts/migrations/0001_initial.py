@@ -10,9 +10,18 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('auth', '0012_alter_user_first_name_max_length'),
+        ('auth', '0012_alter_user_first_name_max_length'),
     ]
 
     operations = [
+        migrations.CreateModel(
+            name='BlacklistedToken',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('token', models.TextField()),
+                ('created_at', models.DateTimeField(auto_now_add=True)),
+            ],
+        ),
         migrations.CreateModel(
             name='DogProfile',
             fields=[
@@ -20,11 +29,12 @@ class Migration(migrations.Migration):
                 ('dogname', models.CharField(max_length=40)),
                 ('gender', models.CharField(blank=True, choices=[('수컷', '수컷'), ('중성화', '중성화'), ('암컷', '암컷')], max_length=10)),
                 ('dog_age', models.IntegerField()),
-                ('dog_weight', models.CharField(max_length=50)),
+                ('dog_weight', models.FloatField(max_length=50)),
                 ('dog_blood', models.CharField(choices=[('DEA 1-', 'DEA 1-'), ('DEA 1.1', 'DEA 1.1'), ('DEA 1.2', 'DEA 1.2'), ('DEA 3', 'DEA 3'), ('DEA 4', 'DEA 4'), ('DEA 5', 'DEA 5'), ('DEA 7', 'DEA 7')], max_length=15)),
             ],
         ),
         migrations.CreateModel(
+            name='User',
             name='User',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
@@ -42,6 +52,11 @@ class Migration(migrations.Migration):
                 ('groups', models.ManyToManyField(blank=True, help_text='The groups this user belongs to. A user will get all permissions granted to each of their groups.', related_name='custom_user_set', related_query_name='user', to='auth.group')),
                 ('user_permissions', models.ManyToManyField(blank=True, help_text='Specific permissions for this user.', related_name='custom_user_permission_set', related_query_name='user', to='auth.permission')),
             ],
+            options={
+                'verbose_name': 'user',
+                'verbose_name_plural': 'users',
+                'abstract': False,
+            },
             options={
                 'verbose_name': 'user',
                 'verbose_name_plural': 'users',

@@ -14,6 +14,9 @@ from pathlib import Path
 from django.conf import settings
 import environ, os, json, sys
 from datetime import timedelta
+from django.conf import settings
+import environ, os, json, sys
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -32,6 +35,8 @@ DEBUG = env('DEBUG')
 
 KAKAO_REST_API_KEY = env('KAKAO_REST_API_KEY')
 
+KAKAO_REST_API_KEY = env('KAKAO_REST_API_KEY')
+
 ALLOWED_HOSTS = ['*']
 
 
@@ -44,6 +49,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
     'django.contrib.sites',
 
     'accounts',
@@ -61,7 +67,18 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.kakao',
+    'rest_framework_simplejwt',
+    'rest_framework.authtoken',
+    'dj_rest_auth',
+    'dj_rest_auth.registration',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.kakao',
     'corsheaders',
+
+    #추가됨
+    'rest_framework_simplejwt.token_blacklist',
 ]
 
 MIDDLEWARE = [
@@ -75,6 +92,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    'allauth.account.middleware.AccountMiddleware',
 
     'allauth.account.middleware.AccountMiddleware',
 ]
@@ -169,8 +188,9 @@ CORS_ALLOWED_ORIGINS = [
     'http://127.0.0.1:5173',
 
     # 프론트엔드 도메인 또는 IP 주소
-    'http://프론트주소',
-    'http://프론트주소:포트번호',
+    'http://13.209.25.242',
+    'http://13.209.25.242:5173'
+
 ]
 
 REST_AUTH = {
