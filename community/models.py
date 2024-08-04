@@ -1,5 +1,6 @@
 from django.db import models
-from django.contrib.auth.models import User
+# from django.contrib.auth.models import User
+from accounts.models import UserProfile
 # Create your models here.
 def image_upload_path(instance, filename):
     return f'{instance.pk}/{filename}'
@@ -7,7 +8,7 @@ def image_upload_path(instance, filename):
 class Post(models.Model):
     id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=100)
-    writer = models.ForeignKey(User, on_delete=models.CASCADE)
+    writer = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     content = models.CharField(max_length=300)
 
     REGION_TYPES = [
@@ -42,13 +43,13 @@ class Post(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    like = models.ManyToManyField(User, related_name='likes', blank=True)
+    like = models.ManyToManyField(UserProfile, related_name='likes', blank=True)
     like_num = models.PositiveIntegerField(default=0)
 
 class Comment(models.Model):
     id = models.AutoField(primary_key=True)
     post = models.ForeignKey(Post, null=False, blank=False, on_delete=models.CASCADE, related_name='comments')
-    writer = models.ForeignKey(User, on_delete=models.CASCADE)
+    writer = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     content = models.CharField(max_length=150)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -57,7 +58,7 @@ class Comment(models.Model):
 class Recomment(models.Model):
     id = models.AutoField(primary_key=True)
     comment = models.ForeignKey(Comment, null=False, blank=False, on_delete=models.CASCADE, related_name='recomments')
-    writer = models.ForeignKey(User, on_delete=models.CASCADE)
+    writer = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     content = models.CharField(max_length=150)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
