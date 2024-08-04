@@ -6,11 +6,11 @@ class Sizetest(models.Model):
     id = models.AutoField(primary_key=True)
     writer = models.ForeignKey(User, on_delete=models.CASCADE, default='')
     SIZE_CHOICES = [
-        ('SM', '소형견'),
-        ('LG', '대형견'),
+        ('소형견', '소형견'),
+        ('대형견', '대형견'),
     ]
 
-    size = models.CharField(max_length=2, choices=SIZE_CHOICES)
+    size = models.CharField(max_length=3, choices=SIZE_CHOICES)
     def __str__(self):
         return self.get_size_display()
     
@@ -18,9 +18,9 @@ class Agetest(models.Model):
     id = models.AutoField(primary_key=True)
     writer = models.ForeignKey(User, on_delete=models.CASCADE, default='')
     AGE_CHOICES = [
-        ('UNDER_18M', '18개월 미만'),
-        ('18M_TO_8Y', '18개월~8살'),
-        ('OVER_9Y', '9살 이상'),
+        ('~18M', '18개월 미만'),
+        ('18M~8Y', '18개월~8살'),
+        ('9Y~', '9살 이상'),
     ]
 
     age_group = models.CharField(max_length=10, choices=AGE_CHOICES)
@@ -31,8 +31,8 @@ class Weighttest(models.Model):
     id = models.AutoField(primary_key=True)
     writer = models.ForeignKey(User, on_delete=models.CASCADE, default='')
     WEIGHT_CHOICES = [
-        ('UNDER_20KG', '20kg 이하'),
-        ('OVER_20KG', '20kg 이상'),
+        ('~20KG', '20kg 이하'),
+        ('20KG~', '20kg 이상'),
     ]
 
     weight_group = models.CharField(max_length=10, choices=WEIGHT_CHOICES)
@@ -44,8 +44,8 @@ class Vaccinetest(models.Model):
     id = models.AutoField(primary_key=True)
     writer = models.ForeignKey(User, on_delete=models.CASCADE, default='')
     VACCINE_CHOICES = [
-        ('YES', '네'),
-        ('NO', '아니요'),
+        ('접종', '접종'),
+        ('미접종', '미접종'),
     ]
 
     is_vaccinated = models.CharField(max_length=3, choices=VACCINE_CHOICES)
@@ -57,8 +57,8 @@ class Diseasetest(models.Model):
     id = models.AutoField(primary_key=True)
     writer = models.ForeignKey(User, on_delete=models.CASCADE, default='')
     DISEASE_CHOICES = [
-        ('YES', '네'),
-        ('NO', '아니요'),
+        ('네', '네'),
+        ('아니요', '아니요'),
     ]
 
     has_disease = models.CharField(max_length=3, choices=DISEASE_CHOICES)
