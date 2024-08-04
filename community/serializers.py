@@ -16,7 +16,7 @@ class PostListSerializer(serializers.ModelSerializer):
 
     writer = serializers.SerializerMethodField(read_only=True)
     def get_writer(self, instance):
-        return instance.writer.username
+        return instance.writer.nickname
 
     created_at =serializers.SerializerMethodField(read_only=True)
 
@@ -61,7 +61,7 @@ class PostSerializer(serializers.ModelSerializer):
     writer = serializers.SerializerMethodField(read_only=True)
     def get_writer(self, instance):
         writer = instance.writer
-        return writer.username
+        return writer.nickname
     
     comments = serializers.SerializerMethodField(read_only=True)
     def get_comments(self, instance):
@@ -84,7 +84,7 @@ class PostSerializer(serializers.ModelSerializer):
     # 이거는 확인용임(추후에 없앨수도)
     def get_like(self, instance):
         likes = instance.like.all()
-        return [like.username for like in likes]
+        return [like.nickname for like in likes]
     
     image_1 = serializers.ImageField(use_url=True, required=False)
     image_2 = serializers.ImageField(use_url=True, required=False)
@@ -114,7 +114,7 @@ class CommentListSerializer(serializers.ModelSerializer):
 
     writer = serializers.SerializerMethodField(read_only=True)
     def get_writer(self, instance):
-        return instance.writer.username
+        return instance.writer.nickname
     
     created_at = serializers.SerializerMethodField(read_only=True)
     def get_created_at(self, instance):
@@ -142,7 +142,7 @@ class CommentSerializer(serializers.ModelSerializer):
     
     writer = serializers.SerializerMethodField(read_only = True)
     def get_writer(self, instance):
-        return instance.writer.username
+        return instance.writer.nickname
     
     recomments = serializers.SerializerMethodField(read_only=True)
     def get_recomments(self, instance):
@@ -182,7 +182,7 @@ class RecommentSerializer(serializers.ModelSerializer):
     
     writer = serializers.SerializerMethodField(read_only=True)
     def get_writer(self, instance):
-        return instance.writer.username
+        return instance.writer.nickname
 
     #profile_iamge = serializers.ImageField(source='profile.imgae')
 

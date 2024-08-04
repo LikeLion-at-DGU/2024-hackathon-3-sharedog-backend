@@ -8,9 +8,10 @@ from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import get_user_model
 from .models import Post, Comment, Recomment
 from .serializers import PostListSerializer, PostSerializer, CommentSerializer, CommentListSerializer, RecommentSerializer
+from accounts.models import UserProfile
 
 # Create your views here.
-User = get_user_model()
+
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     # permission_classes = [IsAuthenticated]
@@ -49,9 +50,8 @@ class PostViewSet(viewsets.ModelViewSet):
     
     def perform_create(self, serializer):
         user = self.request.user
-        serializer.save(writer=user)
-        user = self.request.user
-        serializer.save(writer=user)
+        user_profile = UserProfile.objects.get(user=user)
+        serializer.save(writer=user_profile)
     
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
@@ -149,7 +149,9 @@ class CommentViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Re
     def perform_create(self, serializer):
         post_id = self.kwargs.get('post_id')  # URL에서 post_id를 가져옵니다.
         post = get_object_or_404(Post, id=post_id)  # 해당 post_id로 Post 객체를 가져옵니다.
-        serializer.save(writer=self.request.user, post=post) 
+        user = self.request.user
+        user_profile = UserProfile.objects.get(user=user)
+        serializer.save(writer=user_profile, post=post) 
     
     @action(methods=['GET'], detail=True, url_path='recomments')
     def list_recomments(self, request, pk=None):
@@ -163,7 +165,9 @@ class CommentViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Re
         comment = get_object_or_404(Comment, id=pk)
         serializer = RecommentSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save(comment=comment, writer=self.request.user)
+        user = self.request.user
+        user_profile = UserProfile.objects.get(user=user)
+        serializer.save(comment=comment, writer=user_profile)
         return Response(serializer.data)
     '''
     def list(self, request, comment_id=None):
@@ -195,11 +199,15 @@ class PostCommentViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.
         post = get_object_or_404(Post, id=post_id)
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save(post=post, writer=self.request.user)
+        user = self.request.user
+        user_profile = UserProfile.objects.get(user=user)
+        serializer.save(post=post, writer=user_profile)
         return Response(serializer.data)
     
     def perform_create(self, serializer):
-        serializer.save(writer=self.request.user)
+        user = self.request.user
+        user_profile = UserProfile.objects.get(user=user)
+        serializer.save(writer=user_profile)
     
 class RecommentViewSet(viewsets.GenericViewSet,mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.DestroyModelMixin):
     queryset = Recomment.objects.all()
@@ -221,7 +229,9 @@ class CommentReCommentViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mi
         comment = get_object_or_404(Comment, id=comment_id, post=post)
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save(comment=comment, writer=self.request.user)
+        user = self.request.user
+        user_profile = UserProfile.objects.get(user=user)
+        serializer.save(comment=comment, writer=user_profile)
         return Response(serializer.data)
     def retrieve(self, request, post_id=None, comment_id=None, pk=None):
         post = get_object_or_404(Post, id=post_id)
@@ -252,7 +262,8 @@ class LikePostViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.Ret
 
     def list(self, request, user_id=None):
         user = self.request.user
-        queryset = self.filter_queryset(self.get_queryset().filter(like=user))
+        user_profile = UserProfile.objects.get(user=user)
+        queryset = self.filter_queryset(self.get_queryset().filter(like=user_profile))
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 '''
