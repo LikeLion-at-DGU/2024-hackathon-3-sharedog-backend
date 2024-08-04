@@ -30,7 +30,7 @@ class DogProfile(models.Model):
 
     id = models.AutoField(primary_key=True)
     dogname = models.CharField(max_length=40)
-    owner = models.ForeignKey(UserProfile, related_name='dogs', on_delete=models.CASCADE, null=True, blank=True)
+    owner = models.ForeignKey(User, related_name='dogs', on_delete=models.CASCADE, null=True, blank=True)
     GENDER_M = "수컷"
     GENDER_N = "중성화"
     GENDER_F = "암컷"
