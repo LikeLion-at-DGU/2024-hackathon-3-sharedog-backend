@@ -96,7 +96,8 @@ class TotaltestViewSet(viewsets.ModelViewSet):
 class MainAPIView(APIView):
     def get(self, request, region=None):
         # 모든 UserProfile 객체를 가져옵니다.
-        profiles = UserProfile.objects.all()
+        user = self.request.user
+        profiles = UserProfile.objects.filter(user=user)
         profiles_data = UserProfileSerializer(profiles, many=True, context={'request': request}).data
         
         # region이 주어지면 해당 지역의 Post를 가져옵니다.
