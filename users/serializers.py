@@ -47,3 +47,8 @@ class MyPostSerializer(serializers.ModelSerializer):
             # 절대 URL 생성
             return request.build_absolute_uri(obj.image_1.url)
         return None
+    
+class MypageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserProfile
+        fields = ['nickname','email']

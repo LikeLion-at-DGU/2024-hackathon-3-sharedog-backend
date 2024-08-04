@@ -53,6 +53,7 @@ class KakaoLogin(APIView):
             user_profile, created = UserProfile.objects.get_or_create(user=user)
             user_profile.nickname = nickname
             user_profile.profile_image = profile_image
+            user_profile.email = email
             user_profile.save()
         except Exception as e:
             print(f"Error creating user: {str(e)}")  # 추가된 로그
