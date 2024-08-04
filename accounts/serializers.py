@@ -12,7 +12,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 class DogProfileSerializer(serializers.ModelSerializer):
     dog_image = serializers.ImageField(use_url=True, required=False)
-
+    
     class Meta: 
         model = DogProfile
         fields = '__all__'
