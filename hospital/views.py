@@ -91,7 +91,7 @@ class HospitalReservationViewSet(viewsets.GenericViewSet, mixins.ListModelMixin,
         hospital = get_object_or_404(Hospital, id=hospital_id)
         user_id = self.request.user.id
         user = get_object_or_404(User, id=user_id)
-        dog = Dog.objects.filter(user=user).first()
+        dog = dog.objects.filter(user=user).first()
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save(hospital=hospital, dog=dog, user=user)
