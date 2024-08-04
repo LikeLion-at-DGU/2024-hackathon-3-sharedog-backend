@@ -87,6 +87,15 @@ def protected_view(request):
     }
     return Response(user_data, status=status.HTTP_200_OK)
 
+@api_view(['GET'])
+def check_user_status(request):
+    user = request.user
+    if user.is_authenticated:
+        user_profile = UserProfile.objects.get(user=user)
+        has_dog_info = DogProfile.objects.filter(owner=user_profile).exists()
+        return Response({'has_dog_info': has_dog_info})
+    else:
+        return Response({'error': 'User is not authenticated'},status=401)
 
 class DogProfileViewSet(viewsets.ModelViewSet):
     queryset = DogProfile.objects.all()

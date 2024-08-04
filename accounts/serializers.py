@@ -16,10 +16,16 @@ class DogProfileSerializer(serializers.ModelSerializer):
         model = DogProfile
         fields = '__all__'
 
+
+# class UserDogSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = UserDog
+#         fields = ['check_dog']
+
 class UserProfileSerializer(serializers.ModelSerializer):
     profile_image = serializers.ImageField(use_url=True, required=False)
     dogs = DogProfileSerializer(many=True, read_only=True)
 
     class Meta:
         model = UserProfile
-        fields = ['nickname', 'profile_image','email','dogs']
+        fields = ['nickname', 'profile_image','email', 'dogs']
