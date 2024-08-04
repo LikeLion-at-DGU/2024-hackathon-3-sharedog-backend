@@ -11,7 +11,7 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     nickname = models.CharField(max_length=255, blank=True, null=True)
     profile_image = models.ImageField(upload_to=image_upload_path, blank=True, null=True)
-
+    email = models.EmailField(null=True, blank=True)
     def __str__(self):
         return self.user.username
 
@@ -29,7 +29,7 @@ class DogProfile(models.Model):
 
     id = models.AutoField(primary_key=True)
     dogname = models.CharField(max_length=40)
-    # owner = models.ForeignKey(Profile, related_name='dogs', on_delete=models.CASCADE)
+    owner = models.ForeignKey(UserProfile, related_name='dogs', on_delete=models.CASCADE,null=True,blank=True)
     GENDER_M = "수컷"
     GENDER_N = "중성화"
     GENDER_F = "암컷"
