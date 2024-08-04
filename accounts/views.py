@@ -110,4 +110,6 @@ class DogProfileViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     def perform_create(self, serializer):
-        serializer.save()
+        user = self.request.user
+        user_profile = UserProfile.objects.get(user=user)
+        serializer.save(owner=user_profile)
