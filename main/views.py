@@ -95,26 +95,26 @@ class TotaltestViewSet(viewsets.ModelViewSet):
 
 class MainAPIView(APIView):
     def get(self, request, region=None):
-        # 모든 UserProfile 객체를 가져옵니다.
-        user = self.request.user
+        return Response(self.get_data(request, region))
+
+    def get_data(self, request, region=None):
+        user = request.user
         profiles = UserProfile.objects.filter(user=user)
         profiles_data = UserProfileSerializer(profiles, many=True, context={'request': request}).data
         
-        # region이 주어지면 해당 지역의 Post를 가져옵니다.
         if region:
             posts = Post.objects.filter(region=region).order_by('-created_at')[:2]
         else:
-            # region이 없으면 모든 Post를 가져옵니다.
             posts = Post.objects.filter(region='서울').order_by('-created_at')[:2]
         posts_data = PostSerializer(posts, many=True, context={'request': request}).data
 
-        data = {
+        return {
             'profiles': profiles_data,
             'posts': posts_data,
         }
-        return Response(data)
 
-    @action(methods=["GET"], detail=False, url_path='region/(?P<region>[^/.]+)')
-    def filter_by_region(self, request, region=None):
-        # 'region'에 따라 필터링합니다.
-        return self.get(request, region=region)
+class FilterByRegionAPIView(APIView):
+    def get(self, request, region=None):
+        main_api_view = MainAPIView()
+        data = main_api_view.get_data(request, region=region if region else '서울')
+        return Response(data)
