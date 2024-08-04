@@ -35,18 +35,21 @@ class MyPostViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
 
         user = self.request.user
-        return Post.objects.filter(writer=user)
+        user_profile = user.userprofile
+        return Post.objects.filter(writer=user_profile)
 
-class LikePostViewSet(viewsets.ModelViewSet):  # ReadOnly로 설정하여 읽기 전용
+class LikePostViewSet(viewsets.ReadOnlyModelViewSet):  # ReadOnly로 설정하여 읽기 전용
     serializer_class = MyPostSerializer
     permission_classes = [IsAuthenticated]  # 인증된 사용자만 접근 가능
 
     def get_queryset(self):
         # 현재 요청을 보낸 사용자를 가져옵니다.
         user = self.request.user
+        user_profile = user.userprofile
         # 사용자가 좋아요를 누른 게시물만 반환합니다.
-        liked_posts = Post.objects.filter(like=user)
+        liked_posts = Post.objects.filter(like=user_profile)
         return liked_posts
+    
 class CommentedPostViewSet(viewsets.ModelViewSet):  # ReadOnly로 설정하여 읽기 전용
     serializer_class = MyPostSerializer
     permission_classes = [IsAuthenticated]  # 인증된 사용자만 접근 가능
@@ -66,6 +69,7 @@ class MypageViewSet(mixins.RetrieveModelMixin,
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-
+    # 현재 요청을 보낸 사용자의 UserProfile을 가져와 필터링
         user = self.request.user
+        # UserProfile.objects.get(user=user) 대신
         return UserProfile.objects.filter(user=user)
