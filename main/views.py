@@ -105,7 +105,7 @@ class MainAPIView(APIView):
             posts = Post.objects.filter(region=region).order_by('-created_at')[:2]
         else:
             # region이 없으면 모든 Post를 가져옵니다.
-            posts = Post.objects.all().order_by('-created_at')[:2]
+            posts = Post.objects.filter(region='서울').order_by('-created_at')[:2]
         posts_data = PostSerializer(posts, many=True, context={'request': request}).data
 
         data = {
