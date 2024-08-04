@@ -75,13 +75,14 @@ class KakaoLogin(APIView):
 def protected_view(request):
     user = request.user
     user_profile = UserProfile.objects.get(user=user)
+    user_profile_serializer = UserProfileSerializer(user_profile)
+
     user_data = {
         "username": user.username,
         "email": user.email,
         "first_name": user.first_name,
         "last_name": user.last_name,
-        "nickname": user_profile.nickname,
-        "profile_image": user_profile.profile_image,
+        "user_profile": user_profile_serializer.data,
     }
     return Response(user_data, status=status.HTTP_200_OK)
 
