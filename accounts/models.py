@@ -1,12 +1,19 @@
 from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from django.contrib.auth.models import AbstractUser, BaseUserManager, Group, Permission
+from django.contrib.auth.models import User
 
 # Create your models here.
 def image_upload_path(instance, filename):
     return f'{instance.pk}/{filename}'
 
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    nickname = models.CharField(max_length=255, blank=True, null=True)
+    profile_image = models.ImageField(upload_to=image_upload_path, blank=True, null=True)
+
+    def __str__(self):
+        return self.user.username
 
 # class Profile(models.Model):
     
