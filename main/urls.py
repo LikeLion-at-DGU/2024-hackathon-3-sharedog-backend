@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework import routers
-from .views import SizetestViewSet, AgetestViewSet, WeighttestViewSet, VaccinetestViewSet, DiseasetestViewSet, TotaltestViewSet, MainAPIView
+from .views import *
 
 from django.conf import settings
 
@@ -16,4 +16,5 @@ default_router.register("totaltests", TotaltestViewSet, basename="totaltests")
 urlpatterns = [
     path("", include(default_router.urls)),
     path('main', MainAPIView.as_view(), name='main-api'),
+    path('main/region/<str:region>/', FilterByRegionAPIView.as_view(), name='filter-by-region'),
 ]
