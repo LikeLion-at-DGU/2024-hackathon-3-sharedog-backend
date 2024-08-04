@@ -29,6 +29,7 @@ class UserProfile(models.Model):
 class DogProfile(models.Model):
 
     id = models.AutoField(primary_key=True)
+
     dogname = models.CharField(max_length=40)
     owner = models.ForeignKey(UserProfile, related_name='dogs', on_delete=models.CASCADE, null=True, blank=True)
     GENDER_M = "수컷"
@@ -52,6 +53,18 @@ class DogProfile(models.Model):
         ('DEA 5', 'DEA 5'),
         ('DEA 7', 'DEA 7'),
     ]
+    dog_image = models.ImageField(upload_to=image_upload_path, blank=True, null=True)
+    kingdog = models.BooleanField(default=True)
 
+    def save(self, *args, **kwargs):
+        # 해당 소유자에게 등록된 강아지가 하나도 없으면 kingdog을 True로 설정
+        if not DogProfile.objects.filter(owner=self.owner).exists():
+            self.kingdog = True
+        
+        # kingdog으로 선택되면, 같은 소유자에게 다른 kingdog을 해제
+        if self.kingdog:
+            DogProfile.objects.filter(owner=self.owner, kingdog=True).exclude(id=self.id).update(kingdog=False)
+        
+        super().save(*args, **kwargs)
     # 다른 필드들
     dog_blood = models.CharField(max_length=15, choices=DOG_BLOOD_TYPES)

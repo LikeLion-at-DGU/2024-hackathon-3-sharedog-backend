@@ -5,20 +5,28 @@ from .serializers import AddDogProfileSerilizer, MyPostSerializer, MypageSeriali
 from rest_framework.response import Response
 from community.models import Post, Comment
 from rest_framework.permissions import IsAuthenticated
+
 class DogProfileViewSet(viewsets.ModelViewSet):
-    queryset = DogProfile.objects.all()
     serializer_class = AddDogProfileSerilizer
 
-    def create(self, request):
+    def get_queryset(self):
+        # 현재 요청을 보낸 사용자의 UserProfile과 연결된 DogProfile만 반환
+        user = self.request.user
+        user_profile = UserProfile.objects.get(user=user)
+        return DogProfile.objects.filter(owner=user_profile)
+
+    def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer) 
-
+        self.perform_create(serializer)
         dogprofile = serializer.instance
         return Response(serializer.data)
 
     def perform_create(self, serializer):
-        serializer.save()
+        # 강아지를 생성할 때 현재 사용자의 UserProfile을 소유자로 설정
+        user = self.request.user
+        user_profile, created = UserProfile.objects.get_or_create(user=user)
+        serializer.save(owner=user_profile)
 
 class MyPostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
