@@ -67,11 +67,6 @@ class KakaoLogin(APIView):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def protected_view(request):
-    return Response({"message": "This is a protected view"}, status=status.HTTP_200_OK)
-
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def user_info(request):
     user = request.user
     user_data = {
         "username": user.username,
