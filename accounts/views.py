@@ -37,7 +37,8 @@ class KakaoLogin(APIView):
         kakao_data = kakao_response.json()
         kakao_id = kakao_data.get("id")
         email = kakao_data.get("kakao_account", {}).get("email")
-
+        nickname = kakao_data.get("properties", {}).get("nickname")
+        profile_image = kakao_data.get("properties", {}).get("profile_image")
         if not email:
             return Response({"error": "Email not provided by Kakao"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -48,6 +49,11 @@ class KakaoLogin(APIView):
             if created:
                 user.set_unusable_password()
                 user.save()
+
+            user_profile, created = UserProfile.objects.get_or_create(user=user)
+            user_profile.nickname = nickname
+            user_profile.profile_image = profile_image
+            user_profile.save()
         except Exception as e:
             print(f"Error creating user: {str(e)}")  # 추가된 로그
             return Response({"error": "Error creating user"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -68,11 +74,14 @@ class KakaoLogin(APIView):
 @permission_classes([IsAuthenticated])
 def protected_view(request):
     user = request.user
+    user_profile = UserProfile.objects.get(user=user)
     user_data = {
         "username": user.username,
         "email": user.email,
         "first_name": user.first_name,
         "last_name": user.last_name,
+        "nickname": user_profile.nickname,
+        "profile_image": user_profile.profile_image,
     }
     return Response(user_data, status=status.HTTP_200_OK)
 
