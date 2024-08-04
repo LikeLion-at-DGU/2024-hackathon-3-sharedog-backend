@@ -114,19 +114,6 @@ class TotaltestSerializer(serializers.ModelSerializer):
         model = Totaltest
         fields = '__all__'
 
-
-
-class DogProfileSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = DogProfile
-        fields = ['id','dogname']
-        
-# class ProfileSerializer(serializers.ModelSerializer):
-#     dogs = DogProfileSerializer(many=True, read_only=True)
-
-#     class Meta:
-#         model = Profile
-#         fields = ['id','name','image','dogs']
 class PostSerializer(serializers.ModelSerializer):
 
     image_1 = serializers.SerializerMethodField() 

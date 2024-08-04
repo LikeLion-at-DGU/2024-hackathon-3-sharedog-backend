@@ -1,7 +1,7 @@
 from accounts.models import *
 from community.models import *
 from rest_framework import viewsets, mixins
-from .serializers import AddDogProfileSerilizer, MyPostSerializer
+from .serializers import AddDogProfileSerilizer, MyPostSerializer, MypageSerializer
 from rest_framework.response import Response
 from community.models import Post, Comment
 from rest_framework.permissions import IsAuthenticated
@@ -49,3 +49,15 @@ class CommentedPostViewSet(viewsets.ModelViewSet):  # ReadOnly로 설정하여 �
         # 사용자가 작성한 댓글의 게시물만 반환합니다.
         commented_posts = Post.objects.filter(comments__writer=user).distinct()
         return commented_posts
+    
+class MypageViewSet(mixins.RetrieveModelMixin,
+                    mixins.UpdateModelMixin,
+                    mixins.ListModelMixin,
+                    viewsets.GenericViewSet):
+    serializer_class = MypageSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+
+        user = self.request.user
+        return UserProfile.objects.filter(user=user)
