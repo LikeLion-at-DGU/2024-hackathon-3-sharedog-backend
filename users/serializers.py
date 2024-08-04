@@ -19,6 +19,10 @@ class MyPostSerializer(serializers.ModelSerializer):
     def get_comments_cnt(self, instance):
         return instance.comments.count()
     
+    writer = serializers.SerializerMethodField(read_only=True)
+    def get_writer(self, instance):
+        return instance.writer.username
+    
     image_1 = serializers.ImageField(use_url=True, required=False)
 
     class Meta:
