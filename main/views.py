@@ -106,9 +106,9 @@ class MainAPIView(APIView):
         kingdog_profiles_data = DogProfileSerializer(kingdog_profiles, many=True, context={'request': request}).data
 
         if region:
-            posts = Post.objects.filter(region=region).order_by('-created_at')[:4]
+            posts = Post.objects.filter(region=region).order_by('-created_at')[:5]
         else:
-            posts = Post.objects.filter(region='서울').order_by('-created_at')[:4]
+            posts = Post.objects.filter(region='서울').order_by('-created_at')[:5]
         posts_data = PostSerializer(posts, many=True, context={'request': request}).data
 
         return {
