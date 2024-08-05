@@ -5,7 +5,7 @@ from .serializers import AddDogProfileSerilizer, MyPostSerializer, MypageSeriali
 from rest_framework.response import Response
 from community.models import Post, Comment
 from rest_framework.permissions import IsAuthenticated
-
+from community.permissions import IsOwnerOrReadOnly
 class DogProfileViewSet(viewsets.ModelViewSet):
     serializer_class = AddDogProfileSerilizer
 
@@ -37,7 +37,12 @@ class MyPostViewSet(viewsets.ModelViewSet):
         user = self.request.user
         user_profile = user.userprofile
         return Post.objects.filter(writer=user_profile)
-
+    
+    def get_permissions(self):
+        if self.action in ["update", "destroy", "partial_update"]:
+            return [IsOwnerOrReadOnly()]
+        return []
+    
 class LikePostViewSet(viewsets.ReadOnlyModelViewSet):  # ReadOnly로 설정하여 읽기 전용
     serializer_class = MyPostSerializer
     permission_classes = [IsAuthenticated]  # 인증된 사용자만 접근 가능
@@ -50,7 +55,7 @@ class LikePostViewSet(viewsets.ReadOnlyModelViewSet):  # ReadOnly로 설정하�
         liked_posts = Post.objects.filter(like=user_profile)
         return liked_posts
     
-class CommentedPostViewSet(viewsets.ModelViewSet):  # ReadOnly로 설정하여 읽기 전용
+class CommentedPostViewSet(viewsets.ReadOnlyModelViewSet):  # ReadOnly로 설정하여 읽기 전용
     serializer_class = MyPostSerializer
     permission_classes = [IsAuthenticated]  # 인증된 사용자만 접근 가능
 
@@ -58,9 +63,10 @@ class CommentedPostViewSet(viewsets.ModelViewSet):  # ReadOnly로 설정하여 �
         # 현재 요청을 보낸 사용자를 가져옵니다.
         user = self.request.user
         # 사용자가 작성한 댓글의 게시물만 반환합니다.
-        commented_posts = Post.objects.filter(comments__writer=user).distinct()
+        user_profile = UserProfile.objects.get(user=user)
+        commented_posts = Post.objects.filter(comments__writer=user_profile).distinct()
         return commented_posts
-    
+
 class MypageViewSet(mixins.RetrieveModelMixin,
                     mixins.UpdateModelMixin,
                     mixins.ListModelMixin,
