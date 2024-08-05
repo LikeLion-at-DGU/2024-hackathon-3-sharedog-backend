@@ -19,9 +19,9 @@ class Agetest(models.Model):
     id = models.AutoField(primary_key=True)
     nickname = models.ForeignKey(UserProfile, on_delete=models.CASCADE, default='')
     AGE_CHOICES = [
-        ('~18M', '18개월 미만'),
-        ('18M~8Y', '18개월~8살'),
-        ('9Y~', '9살 이상'),
+        ('~18M', '18개월 미만이에요'),
+        ('18M~8Y', '18개월 이상 8세 이하에요'),
+        ('9Y~', '9살 이상이에요'),
     ]
 
     age_group = models.CharField(max_length=10, choices=AGE_CHOICES)
@@ -32,8 +32,8 @@ class Weighttest(models.Model):
     id = models.AutoField(primary_key=True)
     nickname = models.ForeignKey(UserProfile, on_delete=models.CASCADE, default='')
     WEIGHT_CHOICES = [
-        ('~20KG', '20kg 이하'),
-        ('20KG~', '20kg 이상'),
+        ('~20KG', '20kg 이하에요'),
+        ('20KG~', '20kg 이상이에요'),
     ]
 
     weight_group = models.CharField(max_length=10, choices=WEIGHT_CHOICES)
@@ -45,8 +45,8 @@ class Vaccinetest(models.Model):
     id = models.AutoField(primary_key=True)
     nickname = models.ForeignKey(UserProfile, on_delete=models.CASCADE, default='')
     VACCINE_CHOICES = [
-        ('접종', '접종'),
-        ('미접종', '미접종'),
+        ('접종', '네! 매월 챙기고 있어요'),
+        ('미접종', '아니요! 매월 챙기지 못했어요'),
     ]
 
     is_vaccinated = models.CharField(max_length=3, choices=VACCINE_CHOICES)
@@ -58,8 +58,8 @@ class Diseasetest(models.Model):
     id = models.AutoField(primary_key=True)
     nickname = models.ForeignKey(UserProfile, on_delete=models.CASCADE, default='')
     DISEASE_CHOICES = [
-        ('네', '네'),
-        ('아니요', '아니요'),
+        ('네', '네! 앓았던 적이 있어요'),
+        ('아니요', '아니요! 앓았던 적이 없어요'),
     ]
 
     has_disease = models.CharField(max_length=3, choices=DISEASE_CHOICES)
