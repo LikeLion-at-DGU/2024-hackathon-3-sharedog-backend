@@ -103,9 +103,9 @@ class MainAPIView(APIView):
         profiles_data = UserProfileSerializer(profiles, many=True, context={'request': request}).data
         
         if region:
-            posts = Post.objects.filter(region=region).order_by('-created_at')[:2]
+            posts = Post.objects.filter(region=region).order_by('-created_at')[:4]
         else:
-            posts = Post.objects.filter(region='서울').order_by('-created_at')[:2]
+            posts = Post.objects.filter(region='서울').order_by('-created_at')[:4]
         posts_data = PostSerializer(posts, many=True, context={'request': request}).data
 
         return {

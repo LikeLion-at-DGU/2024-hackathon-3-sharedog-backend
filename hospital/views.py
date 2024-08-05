@@ -8,7 +8,6 @@ from .serializers import HospitalListSerializer, HospitalSerializer,  Reservatio
 from rest_framework import status
 from rest_framework.response import Response
 
-
 # Create your views here.
 
 class HospitalViewSet(viewsets.ModelViewSet):
@@ -72,10 +71,12 @@ class HospitalViewSet(viewsets.ModelViewSet):
         jeju_hospital = self.filter_queryset(self.get_queryset().filter(region='제주'))
         jeju_hospital_serializer = HospitalSerializer(jeju_hospital, many=True)
         return Response(jeju_hospital_serializer.data)
-    
+# 여기서 부터 고쳐야함
 class ReservationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin, mixins.DestroyModelMixin):
-    queryset = Reservation.objects.all()
     serializer_class = ReservationSerializer
+    def get_queryset(self):
+        user = self.request.user
+        user_profile = UserProfile.objects
 
 class HospitalReservationViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.CreateModelMixin):
     queryset = Reservation.objects.all()
@@ -89,9 +90,9 @@ class HospitalReservationViewSet(viewsets.GenericViewSet, mixins.ListModelMixin,
     
     def create(self, request, hospital_id=None):
         hospital = get_object_or_404(Hospital, id=hospital_id)
-        user_id = self.request.user.id
-        user = get_object_or_404(User, id=user_id)
-        dog = DogProfile.objects.filter(user=user).first()
+        user = self.request.user
+        user_profile = UserProfile.objects.filter(user=user)
+        dog = DogProfile.objects.filter(user=user_profile).first()
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save(hospital=hospital, dog=dog, user=user)

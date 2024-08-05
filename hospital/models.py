@@ -1,6 +1,6 @@
 from django.db import models
 from users.models import DogProfile
-from django.contrib.auth.models import User
+from accounts.models import UserProfile
 
 def image_upload_path(instance, filename):
     return f'{instance.pk}/{filename}'
@@ -38,7 +38,7 @@ class Reservation(models.Model):
     ]
     id = models.AutoField(primary_key=True)
     hospital = models.ForeignKey(Hospital, on_delete=models.CASCADE, related_name='reservations')
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     dog = models.ForeignKey(DogProfile, on_delete=models.CASCADE,null=True)
     selectedDate = models.DateField()
     activeTime = models.CharField(max_length=5, choices=TIME_CHOICES)     

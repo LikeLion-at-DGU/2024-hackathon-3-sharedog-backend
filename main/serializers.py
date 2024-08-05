@@ -2,6 +2,8 @@ from rest_framework import serializers
 from .models import *
 from accounts.models import *
 from community.models import *
+from datetime import datetime, timedelta
+
 class SizetestSerializer(serializers.ModelSerializer):
 
     writer = serializers.SerializerMethodField(read_only=True)
@@ -117,6 +119,20 @@ class TotaltestSerializer(serializers.ModelSerializer):
 class PostSerializer(serializers.ModelSerializer):
 
     image_1 = serializers.SerializerMethodField() 
+    created_at = serializers.SerializerMethodField(read_only=True)
+
+    def get_created_at(self, instance):
+        now = datetime.now(instance.created_at.tzinfo)
+        time_difference = now - instance.created_at
+
+        if time_difference < timedelta(days=1):
+            if time_difference < timedelta(hours=1):
+                if time_difference < timedelta(minutes=1):
+                    return f"방금"
+                return f"{int(time_difference.total_seconds() // 60)}분 전"
+            return f"{int(time_difference.total_seconds() // 3600)}시간 전"
+        else:
+            return f"{time_difference.days}일 전"
     class Meta:
         model = Post
         fields = ['id','blood','region','title','content','image_1','created_at']
