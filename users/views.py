@@ -72,13 +72,37 @@ class CommentedPostViewSet(viewsets.ReadOnlyModelViewSet):  # ReadOnly로 설정
 
 class MypageViewSet(viewsets.ModelViewSet):
     serializer_class = MypageSerializer
-    permission_classes = [IsAuthenticated]
+    #permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
     # 현재 요청을 보낸 사용자의 UserProfile을 가져와 필터링
         user = self.request.user
         # UserProfile.objects.get(user=user) 대신
         return UserProfile.objects.filter(user=user)
+    
+    def create(self, request, *args, **kwargs):
+        # 사용자가 이미 존재하는지 확인하고, 있으면 업데이트, 없으면 생성
+        user = self.request.user
+        user_profile, created = UserProfile.objects.get_or_create(user=user)
+
+        # 업데이트 또는 생성된 프로필을 직렬화
+        serializer = self.get_serializer(user_profile, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        # 성공적으로 생성/업데이트된 사용자 프로필을 반환
+        return Response(serializer.data)
+
+    def update(self, request, *args, **kwargs):
+        # 업데이트할 인스턴스를 가져오고 시리얼라이저를 통해 데이터 갱신
+        user = self.request.user
+        user_profile = UserProfile.objects.get(user=user)
+
+        serializer = self.get_serializer(user_profile, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(serializer.data)
     
 class ReservationUserViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
     queryset = Reservation.objects.all()
