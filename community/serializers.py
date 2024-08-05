@@ -1,10 +1,21 @@
 from datetime import datetime, timedelta
 from rest_framework import serializers
 from .models import *
+from accounts.models import *
+from accounts.serializers import *
+
+
+class KingdogImageSerializer(serializers.ModelSerializer):
+    dog_image = serializers.ImageField(use_url=True, required=False)
+
+    class Meta:
+        model = DogProfile
+        fields = ['dog_image']
 
 class PostListSerializer(serializers.ModelSerializer):
     comments_cnt = serializers.SerializerMethodField()
     is_liked = serializers.SerializerMethodField()
+
     def get_comments_cnt(self, instance):
         return instance.comments.count()
     
@@ -56,7 +67,7 @@ class PostListSerializer(serializers.ModelSerializer):
             'like_num',
             'blood',
             'region',
-            'is_liked'
+            'is_liked',
         ]
 
 class PostSerializer(serializers.ModelSerializer):
@@ -64,6 +75,7 @@ class PostSerializer(serializers.ModelSerializer):
     writer = serializers.SerializerMethodField(read_only=True)
     comments = serializers.SerializerMethodField(read_only=True)
     is_liked = serializers.SerializerMethodField()
+    kingdog_profile = serializers.SerializerMethodField()
     def get_writer(self, instance):
         writer = instance.writer
         return writer.nickname
@@ -103,6 +115,25 @@ class PostSerializer(serializers.ModelSerializer):
         likes = instance.like.all()
         return [like.nickname for like in likes]
     
+    def get_kingdog_profile(self, obj):
+        kingdog_profiles = DogProfile.objects.filter(owner=obj.writer, kingdog=True)
+        serializer = KingdogImageSerializer(kingdog_profiles, many=True, context=self.context)
+        return serializer.data
+    
+    created_at = serializers.SerializerMethodField(read_only=True)
+    def get_created_at(self, instance):
+        now = datetime.now(instance.created_at.tzinfo)
+        time_difference = now - instance.created_at
+
+        if time_difference < timedelta(days=1):
+            if time_difference < timedelta(hours=1):
+                if time_difference < timedelta(minutes=1):
+                    return f"방금"
+                return f"{int(time_difference.total_seconds() // 60)}분 전"
+            return f"{int(time_difference.total_seconds() // 3600)}시간 전"
+        else:
+            return f"{time_difference.days}일 전"
+
     image_1 = serializers.ImageField(use_url=True, required=False)
     image_2 = serializers.ImageField(use_url=True, required=False)
     image_3 = serializers.ImageField(use_url=True, required=False)
@@ -189,10 +220,15 @@ class CommentSerializer(serializers.ModelSerializer):
             return f"{time_difference.days}일 전"
         
     #profile_image = serializers.ImageField(source='profile.imgae')
-        
+    kingdog_profile = serializers.SerializerMethodField()
+    def get_kingdog_profile(self, obj):
+        kingdog_profiles = DogProfile.objects.filter(owner=obj.writer, kingdog=True)
+        serializer = KingdogImageSerializer(kingdog_profiles, many=True, context=self.context)
+        return serializer.data
+
     class Meta:
         model = Comment
-        fields = ['id','post','writer',
+        fields = ['id','post','writer', 'kingdog_profile',
                 #'profile_image',
                 'content','recomments','created_at','updated_at', 'is_owner']
         read_only_fields = ['id', 'post', 'writer',
@@ -230,10 +266,16 @@ class RecommentSerializer(serializers.ModelSerializer):
             return f"{int(time_difference.total_seconds() // 3600)}시간 전"
         else:
             return f"{time_difference.days}일 전"
-        
+    
+    kingdog_profile = serializers.SerializerMethodField()
+    def get_kingdog_profile(self, obj):
+        kingdog_profiles = DogProfile.objects.filter(owner=obj.writer, kingdog=True)
+        serializer = KingdogImageSerializer(kingdog_profiles, many=True, context=self.context)
+        return serializer.data
+    
     class Meta:
         model = Recomment
-        fields = ['id','comment','writer','content','created_at','updated_at', 'is_owner',
+        fields = ['id','comment','writer','content','created_at','updated_at', 'is_owner', 'kingdog_profile',
                 #'profile_iamge'
                 ]
         read_only_fields = ['id','comment', 'writer',
