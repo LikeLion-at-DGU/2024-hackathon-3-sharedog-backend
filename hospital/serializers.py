@@ -37,7 +37,7 @@ class HospitalSerializer(serializers.ModelSerializer):
 
 class ReservationSerializer(serializers.ModelSerializer):
     hospital = serializers.CharField(source='hospital.name', read_only=True)
-    user = serializers.CharField(source='user.username', read_only=True)
+    user = serializers.CharField(source='user.user.username', read_only=True)
     dog = serializers.CharField(source='dog.dog_name', read_only=True)
     
     class Meta:
