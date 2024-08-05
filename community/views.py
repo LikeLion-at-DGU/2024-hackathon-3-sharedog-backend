@@ -30,7 +30,7 @@ class PostViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         search_keyword = self.request.GET.get('q', '')
         post_list = Post.objects.all()
-        
+        post_list = post_list.order_by('-created_at')
         if search_keyword:
             if len(search_keyword) > 1:
                 search_post_list = post_list.filter(
@@ -100,7 +100,7 @@ class PostViewSet(viewsets.ModelViewSet):
         like_post = self.get_object()
         user = self.request.user
         user_profile = UserProfile.objects.get(user=user)
-        if request.user in like_post.like.all():
+        if user_profile in like_post.like.all():
             like_post.like.remove(user_profile)
             like_post.like_num -= 1
             like_post.save()

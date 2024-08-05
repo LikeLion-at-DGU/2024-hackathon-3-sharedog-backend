@@ -1,5 +1,5 @@
 <div align="center" style="font-size: 1.5em;">
-     <strong>&#x1F64B; 멋쟁이사자처럼 중앙 해커톤 '포피' 백엔드 레포지토리 입니다. &#x1F64B;</strong>
+     <strong>&#x1F64B; 멋쟁이사자처럼 중앙 해커톤 '나눠주개' 백엔드 레포지토리 입니다. &#x1F64B;</strong>
 </div>
 <br>
 
@@ -73,7 +73,7 @@ ex) 💄 Design: 가로스크롤 개선
 
 ## 🛠️ 사용 언어
 <div>
-  <img src="https://img.shields.io/badge/html5-E34F26?style=flat&logo=html5&logoColor=white" />
-  <img src="https://img.shields.io/badge/javascript-F7DF1E?style=flat&logo=javascript&logoColor=white" />
-  <img src="https://img.shields.io/badge/React-61DAFB?style=flat&logo=React&logoColor=white" />
+     <img src="https://img.shields.io/badge/python-3776AB?style=for-the-badge&logo=python&logoColor=white">
+     <img src="https://img.shields.io/badge/django-092E20?style=for-the-badge&logo=django&logoColor=white">
+     <img src="https://img.shields.io/badge/sqlite-%2307405e.svg?style=for-the-badge&logo=sqlite&logoColor=white">
 </div>
