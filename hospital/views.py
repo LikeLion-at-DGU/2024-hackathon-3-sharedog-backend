@@ -8,7 +8,6 @@ from .serializers import HospitalListSerializer, HospitalSerializer,  Reservatio
 from rest_framework import status
 from rest_framework.response import Response
 
-
 # Create your views here.
 
 class HospitalViewSet(viewsets.ModelViewSet):
@@ -72,10 +71,12 @@ class HospitalViewSet(viewsets.ModelViewSet):
         jeju_hospital = self.filter_queryset(self.get_queryset().filter(region='제주'))
         jeju_hospital_serializer = HospitalSerializer(jeju_hospital, many=True)
         return Response(jeju_hospital_serializer.data)
-    
+# 여기서 부터 고쳐야함
 class ReservationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin, mixins.DestroyModelMixin):
-    queryset = Reservation.objects.all()
     serializer_class = ReservationSerializer
+    def get_queryset(self):
+        user = self.request.user
+        user_profile = UserProfile.objects
 
 class HospitalReservationViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.CreateModelMixin):
     queryset = Reservation.objects.all()

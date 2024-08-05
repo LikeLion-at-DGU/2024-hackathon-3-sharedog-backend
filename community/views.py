@@ -4,11 +4,12 @@ from django.db.models import Q
 from rest_framework import viewsets, mixins, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from django.contrib.auth import get_user_model
 from .models import Post, Comment, Recomment
 from .serializers import PostListSerializer, PostSerializer, CommentSerializer, CommentListSerializer, RecommentSerializer
 from accounts.models import UserProfile
+from .permissions import IsOwnerOrReadOnly
 
 # Create your views here.
 
@@ -16,6 +17,11 @@ class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     # permission_classes = [IsAuthenticated]
     
+    def get_permissions(self):
+        if self.action in ["update", "destroy", "partial_update"]:
+            return [IsOwnerOrReadOnly()]
+        return []
+
     def get_serializer_class(self):
         if self.action == "list":
             return PostListSerializer
@@ -83,30 +89,40 @@ class PostViewSet(viewsets.ModelViewSet):
     def perform_update(self, serializer):
         serializer.save()
 
-
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['request'] = self.request
+        return context
+    
+    # 게시물 안에 들어가서 좋아요 구현
     @action(methods=['POST'], detail=True)
     def likes(self, request, pk=None):
         like_post = self.get_object()
+        user = self.request.user
+        user_profile = UserProfile.objects.get(user=user)
         if request.user in like_post.like.all():
-            like_post.like.remove(request.user)
+            like_post.like.remove(user_profile)
             like_post.like_num -= 1
             like_post.save()
         else:
-            like_post.like.add(request.user)
+            like_post.like.add(user_profile)
             like_post.like_num += 1
             like_post.save()
         return Response()
     
+    # 게시물 리스트에서 좋아요 구현
     @action(methods=['POST'], detail=False)
     def like_post(self, request):
-        post_id = request.data.get('post_id')
+        post_id = request.data.get('id')
+        user = self.request.user
+        user_profile = UserProfile.objects.get(user=user)
         try:
             like_post = Post.objects.get(pk=post_id)
             if request.user in like_post.like.all():
-                like_post.like.remove(request.user)
+                like_post.like.remove(user_profile)
                 like_post.like_num -= 1
             else:
-                like_post.like.add(request.user)
+                like_post.like.add(user_profile)
                 like_post.like_num += 1
             like_post.save()
             return Response({'like_num': like_post.like_num}, status=status.HTTP_200_OK)
@@ -146,6 +162,11 @@ class CommentViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Re
     serializer_class = CommentSerializer
     lookup_field = 'pk'
 
+    def get_permissions(self):
+        if self.action in ['update', 'destroy', 'partial_update']:
+            return [IsOwnerOrReadOnly()]
+        return []
+    
     def perform_create(self, serializer):
         post_id = self.kwargs.get('post_id')  # URL에서 post_id를 가져옵니다.
         post = get_object_or_404(Post, id=post_id)  # 해당 post_id로 Post 객체를 가져옵니다.
@@ -216,6 +237,11 @@ class RecommentViewSet(viewsets.GenericViewSet,mixins.CreateModelMixin, mixins.R
 class CommentReCommentViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.CreateModelMixin):
     queryset = Recomment.objects.all()
     serializer_class = RecommentSerializer
+
+    def get_permissions(self):
+        if self.action in ['update', 'destroy', 'partial_update']:
+            return [IsOwnerOrReadOnly()]
+        return []
 
     def list(self, request, post_id=None, comment_id=None):
         post = get_object_or_404(Post, id=post_id)

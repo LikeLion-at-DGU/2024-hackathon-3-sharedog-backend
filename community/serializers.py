@@ -57,16 +57,23 @@ class PostListSerializer(serializers.ModelSerializer):
         ]
 
 class PostSerializer(serializers.ModelSerializer):
-    
+    is_owner = serializers.SerializerMethodField()
     writer = serializers.SerializerMethodField(read_only=True)
+    comments = serializers.SerializerMethodField(read_only=True)
     def get_writer(self, instance):
         writer = instance.writer
         return writer.nickname
     
-    comments = serializers.SerializerMethodField(read_only=True)
+    def get_is_owner(self, obj):
+        request = self.context.get('request', None)
+        if request is None:
+            return False
+        return obj.writer.user == request.user
+
     def get_comments(self, instance):
-        serializer = CommentSerializer(instance.comments, many=True)
+        serializer = CommentSerializer(instance.comments, many=True, context=self.context)
         return serializer.data
+
 
     comments_cnt = serializers.SerializerMethodField()
 
@@ -140,13 +147,20 @@ class CommentSerializer(serializers.ModelSerializer):
         post = instance.post
         return post.id
     
+    is_owner = serializers.SerializerMethodField()
+    def get_is_owner(self, obj):
+        request = self.context.get('request', None)
+        if request is None:
+            return False
+        return obj.writer.user == request.user
+    
     writer = serializers.SerializerMethodField(read_only = True)
     def get_writer(self, instance):
         return instance.writer.nickname
     
     recomments = serializers.SerializerMethodField(read_only=True)
     def get_recomments(self, instance):
-        serializer = RecommentSerializer(instance.recomments, many=True)
+        serializer = RecommentSerializer(instance.recomments, many=True, context=self.context)
         return serializer.data
     
     created_at = serializers.SerializerMethodField(read_only=True)
@@ -169,7 +183,7 @@ class CommentSerializer(serializers.ModelSerializer):
         model = Comment
         fields = ['id','post','writer',
                 #'profile_image',
-                'content','recomments','created_at','updated_at']
+                'content','recomments','created_at','updated_at', 'is_owner']
         read_only_fields = ['id', 'post', 'writer',
                             #'profile_image'
                             ]
@@ -183,12 +197,32 @@ class RecommentSerializer(serializers.ModelSerializer):
     writer = serializers.SerializerMethodField(read_only=True)
     def get_writer(self, instance):
         return instance.writer.nickname
-
+    
+    is_owner = serializers.SerializerMethodField()
+    def get_is_owner(self, obj):
+        request = self.context.get('request', None)
+        if request is None:
+            return False
+        return obj.writer.user == request.user
     #profile_iamge = serializers.ImageField(source='profile.imgae')
 
+    created_at = serializers.SerializerMethodField(read_only=True)
+    def get_created_at(self, instance):
+        now = datetime.now(instance.created_at.tzinfo)
+        time_difference = now - instance.created_at
+
+        if time_difference < timedelta(days=1):
+            if time_difference < timedelta(hours=1):
+                if time_difference < timedelta(minutes=1):
+                    return f"방금"
+                return f"{int(time_difference.total_seconds() // 60)}분 전"
+            return f"{int(time_difference.total_seconds() // 3600)}시간 전"
+        else:
+            return f"{time_difference.days}일 전"
+        
     class Meta:
         model = Recomment
-        fields = ['id','comment','writer','content','created_at','updated_at',
+        fields = ['id','comment','writer','content','created_at','updated_at', 'is_owner',
                 #'profile_iamge'
                 ]
         read_only_fields = ['id','comment', 'writer',
