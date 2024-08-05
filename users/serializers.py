@@ -1,7 +1,11 @@
+from datetime import datetime
 from rest_framework import serializers
 from accounts.models import *
 from community.models import *
 from hospital.models import *
+from accounts.serializers import *
+from django.utils.timezone import make_aware
+
 class AddDogProfileSerilizer(serializers.ModelSerializer):
     owner = serializers.CharField(source='owner.nickname', read_only=True)
 
@@ -65,15 +69,60 @@ class MypageSerializer(serializers.ModelSerializer):
             'id','updated_at','created_at'
         ]
 
-class ReservationSerializer(serializers.ModelSerializer):
-    hospital = serializers.CharField(source='hospital.name', read_only=True)
-    dog = serializers.CharField(source='dog.dog_name', read_only=True)
-    user = serializers.SerializerMethodField(read_only=True)
+class MypageReservationSerializer(serializers.ModelSerializer):
+    hospital = serializers.ReadOnlyField(source='hospital.name')
+    dog = DogProfileSerializer(read_only=True)
+    user = serializers.ReadOnlyField(source='user.nickname')
+    kingdog_info = serializers.ReadOnlyField(source='dog.kingdog_info')
+    dateHead = serializers.SerializerMethodField()
+    dateContent = serializers.SerializerMethodField()
+    is_past = serializers.SerializerMethodField()
+    donation_status = serializers.CharField(required=False, allow_blank=True, max_length=20)
 
-    def get_user(self, instance):
-        return instance.user.nickname
+    def get_dateHead(self, obj):
+        days = ['월', '화', '수', '목', '금', '토', '일']
+        selected_date = obj.selectedDate
+        day_of_week = days[selected_date.weekday()]
+        return selected_date.strftime(f"%Y.%m.%d ({day_of_week})")
+
+    def get_dateContent(self, obj):
+        days = ['월', '화', '수', '목', '금', '토', '일']
+        selected_date = obj.selectedDate
+        day_of_week = days[selected_date.weekday()]
+        return selected_date.strftime(f"%m월 %d일 {day_of_week}요일")
     
+    def get_is_past(self, obj):
+        # 현재 시간
+        now = datetime.now().date()  # 현재 날짜를 datetime.date로 변환
+
+        # selected_date가 현재 날짜를 기준으로 지났는지 확인
+        return obj.selectedDate < now
+    
+    def update(self, instance, validated_data):
+        # Update the donation status if applicable
+        donation_status = validated_data.get('donation_status', None)
+        if instance.is_past and donation_status == 'completed':
+            instance.blood_donation_completed = True
+        instance.save()
+        return instance
+
+    def create(self, validated_data):
+        request = self.context.get('request')
+        user = request.user
+        user_profile = UserProfile.objects.get(user=user)
+
+        # kingdog 값이 True인 dog 가져오기
+        kingdog = DogProfile.objects.filter(owner=user_profile, kingdog=True).first()
+        if not kingdog:
+            raise serializers.ValidationError("kingdog를 찾을 수 없습니다.")
+        
+        blood_donation_completed = validated_data.get('blood_donation_completed', False)
+        validated_data['user'] = user_profile
+        validated_data['dog'] = kingdog
+        reservation = Reservation.objects.create(**validated_data, blood_donation_completed=blood_donation_completed)
+        return reservation
+
     class Meta:
         model = Reservation
         fields = '__all__'
-        read_only_fields = ['hospital', 'user', 'dog']
+        read_only_fields = ['hospital', 'user']

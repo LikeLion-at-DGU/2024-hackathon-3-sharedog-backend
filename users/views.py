@@ -1,13 +1,14 @@
 from accounts.models import *
 from community.models import *
-from rest_framework import viewsets, mixins
+from rest_framework import viewsets, mixins, status
 from .serializers import AddDogProfileSerilizer, MyPostSerializer, MypageSerializer
 from rest_framework.response import Response
 from community.models import Post, Comment
 from rest_framework.permissions import IsAuthenticated
 from community.permissions import IsOwnerOrReadOnly
 from hospital.models import Reservation
-from hospital.serializers import ReservationSerializer
+from .serializers import MypageReservationSerializer
+from rest_framework.decorators import action
 
 class DogProfileViewSet(viewsets.ModelViewSet):
     serializer_class = AddDogProfileSerilizer
@@ -105,8 +106,8 @@ class MypageViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
     
 class ReservationUserViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
-    queryset = Reservation.objects.all()
-    serializer_class = ReservationSerializer
+    queryset = Reservation.objects.all().order_by('-selectedDate')
+    serializer_class = MypageReservationSerializer
 
     def list(self, request, user_id=None):
         user = self.request.user
@@ -114,3 +115,34 @@ class ReservationUserViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mix
         queryset = self.filter_queryset(self.get_queryset().filter(user=user_profile))
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
+    
+    @action(detail=True, methods=['post'])
+    def update_donation_status(self, request, pk=None):
+        reservation = self.get_object()
+        
+        serializer = MypageReservationSerializer(reservation)
+        is_past = serializer.data.get('is_past', False)
+
+        if not is_past:
+            return Response({'detail': '헌혈 상태를 업데이트할 수 없습니다.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        data = request.data.copy()
+    
+        # 'Blood donation completed' 상태를 업데이트합니다.
+        if 'blood_donation_completed' in data:
+            value = data['blood_donation_completed']
+            if isinstance(value, str):
+                if value.lower() == 'true':
+                    value = True
+                elif value.lower() == 'false':
+                    value = False
+                else:
+                    return Response({'detail': '유효하지 않은 값입니다.'}, status=status.HTTP_400_BAD_REQUEST)
+            elif not isinstance(value, bool):
+                return Response({'detail': '유효하지 않은 값입니다.'}, status=status.HTTP_400_BAD_REQUEST)
+            reservation.blood_donation_completed = value
+            reservation.save()
+            updated_serializer = MypageReservationSerializer(reservation)
+            return Response(updated_serializer.data, status=status.HTTP_200_OK)
+        return Response({'detail': '업데이트할 필드가 없습니다.'}, status=status.HTTP_400_BAD_REQUEST)
+    

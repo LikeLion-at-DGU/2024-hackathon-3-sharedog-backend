@@ -45,3 +45,4 @@ class Reservation(models.Model):
     activeTime = models.CharField(max_length=10, choices=TIME_CHOICES)     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    blood_donation_completed = models.BooleanField(default=False)
