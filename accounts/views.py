@@ -23,6 +23,7 @@ class KakaoLogin(APIView):
     permission_classes = [AllowAny]
     def post(self, request):
         access_token = request.data.get("access_token")
+        #phone = request.data.get("phone")
         if not access_token:
             return Response({"error": "No access token provided"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -55,6 +56,7 @@ class KakaoLogin(APIView):
             user_profile.nickname = nickname
             user_profile.profile_image = profile_image
             user_profile.email = email
+            #user_profile.phone = phone
             user_profile.save()
         except Exception as e:
             print(f"Error creating user: {str(e)}")  # 추가된 로그
@@ -114,3 +116,43 @@ class DogProfileViewSet(viewsets.ModelViewSet):
         user = self.request.user
         user_profile = UserProfile.objects.get(user=user)
         serializer.save(owner=user_profile)
+
+class RegistrationViewSet(viewsets.ModelViewSet):
+    serializer_class = RegistrationSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        # 현재 요청을 보낸 사용자의 UserProfile만 반환합니다.
+        user = self.request.user
+        return UserProfile.objects.filter(user=user)
+
+    def create(self, request, *args, **kwargs):
+        user = request.user
+
+        # 이미 UserProfile이 있는지 확인합니다.
+        user_profile, created = UserProfile.objects.get_or_create(user=user)
+
+        # phone 필드를 업데이트하거나 설정합니다.
+        phone = request.data.get('phone', None)
+        if phone:
+            user_profile.phone = phone
+            user_profile.save()
+
+        serializer = self.get_serializer(user_profile)
+
+        if created:
+            # 프로필이 새로 생성된 경우에는 전체 프로필 데이터를 반환
+            serializer = self.get_serializer(user_profile)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            # 기존 프로필이었고 phone만 업데이트된 경우
+            return Response({
+                "nickname": serializer.data.get("nickname"),
+                "email": serializer.data.get("email"),
+                "phone": serializer.data.get("phone")
+            }, status=status.HTTP_200_OK)
+
+    def perform_create(self, serializer):
+        # 이 메서드는 더 이상 필요하지 않을 수 있습니다.
+        # serializer.save(user=self.request.user)
+        pass

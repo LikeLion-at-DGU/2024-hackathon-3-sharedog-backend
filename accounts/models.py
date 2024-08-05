@@ -12,7 +12,7 @@ class UserProfile(models.Model):
     nickname = models.CharField(max_length=255, blank=True, null=True)
     profile_image = models.ImageField(upload_to=image_upload_path, blank=True, null=True)
     email = models.EmailField(null=True, blank=True)
-
+    phone = models.CharField(max_length=20, null=True,blank=True, default='')
     def __str__(self):
         return self.user.username
 
