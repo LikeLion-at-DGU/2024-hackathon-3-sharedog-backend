@@ -154,7 +154,7 @@ class PostViewSet(viewsets.ModelViewSet):
         if blood:
             queryset = queryset.filter(blood=blood)
         
-        serializer = PostListSerializer(queryset, many=True, context={'request':request})
+        serializer = PostListSerializer(queryset, many=True, context=self.get_serializer_context())
         return Response(serializer.data)
 
 class CommentViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.DestroyModelMixin):
