@@ -32,16 +32,16 @@ class Hospital(models.Model):
     
 class Reservation(models.Model):
     TIME_CHOICES = [
-        ('10:00', '10시'),
-        ('13:00', '13시'),
-        ('15:00', '15시'),
+        ('오전 10시', '10시'),
+        ('오후 13시', '13시'),
+        ('오후 15시', '15시'),
     ]
     id = models.AutoField(primary_key=True)
     hospital = models.ForeignKey(Hospital, on_delete=models.CASCADE, related_name='reservations')
     user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
-    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     dog = models.ForeignKey(DogProfile, on_delete=models.CASCADE,null=True)
+    kingdog_info = models.JSONField(null=True, blank=True)
     selectedDate = models.DateField()
-    activeTime = models.CharField(max_length=5, choices=TIME_CHOICES)     
+    activeTime = models.CharField(max_length=10, choices=TIME_CHOICES)     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
