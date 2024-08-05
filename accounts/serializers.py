@@ -8,7 +8,19 @@ from rest_framework_simplejwt.tokens import RefreshToken
 #         model = Profile
 #         fields = '__all__'
 
+class RegistrationSerializer(serializers.ModelSerializer):
+    nickname = serializers.CharField(read_only=True)
+    email = serializers.CharField(read_only=True)
+    phone = serializers.CharField(required=True)
+    class Meta:
+        model = UserProfile
+        fields = ['nickname','email','phone']
 
+    def update(self, instance, validated_data):
+        # phone 필드 업데이트
+        instance.phone = validated_data.get('phone', instance.phone)
+        instance.save()
+        return instance
 
 class DogProfileSerializer(serializers.ModelSerializer):
     dog_image = serializers.ImageField(use_url=True, required=False)
