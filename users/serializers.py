@@ -60,7 +60,10 @@ class MypageSerializer(serializers.ModelSerializer):
     profile_image = serializers.ImageField(use_url=True, required=False)
     class Meta:
         model = UserProfile
-        fields = ['nickname','email','profile_image']
+        fields = '__all__'
+        read_only_fields = [
+            'id','updated_at','created_at'
+        ]
 
 class ReservationSerializer(serializers.ModelSerializer):
     hospital = serializers.CharField(source='hospital.name', read_only=True)
