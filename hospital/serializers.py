@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import *
+from accounts.serializers import DogProfileSerializer
 
 class HospitalListSerializer(serializers.ModelSerializer):
     class Meta:
@@ -36,11 +37,41 @@ class HospitalSerializer(serializers.ModelSerializer):
         ]
 
 class ReservationSerializer(serializers.ModelSerializer):
-    hospital = serializers.CharField(source='hospital.name', read_only=True)
-    user = serializers.CharField(source='user.user.username', read_only=True)
-    dog = serializers.CharField(source='dog.dog_name', read_only=True)
+    hospital = serializers.ReadOnlyField(source='hospital.name')
+    dog = DogProfileSerializer(read_only=True)
+    user = serializers.ReadOnlyField(source='user.nickname')
+    kingdog_info = serializers.ReadOnlyField(source='dog.kingdog_info')
+    dateHead = serializers.SerializerMethodField()
+    dateContent = serializers.SerializerMethodField()
+
+    def get_dateHead(self, obj):
+        days = ['월', '화', '수', '목', '금', '토', '일']
+        selected_date = obj.selectedDate
+        day_of_week = days[selected_date.weekday()]
+        return selected_date.strftime(f"%Y.%m.%d ({day_of_week})")
+
+    def get_dateContent(self, obj):
+        days = ['월', '화', '수', '목', '금', '토', '일']
+        selected_date = obj.selectedDate
+        day_of_week = days[selected_date.weekday()]
+        return selected_date.strftime(f"%m월 %d일 {day_of_week}요일")
     
+    def create(self, validated_data):
+        request = self.context.get('request')
+        user = request.user
+        user_profile = UserProfile.objects.get(user=user)
+
+        # kingdog 값이 True인 dog 가져오기
+        kingdog = DogProfile.objects.filter(owner=user_profile, kingdog=True).first()
+        if not kingdog:
+            raise serializers.ValidationError("kingdog를 찾을 수 없습니다.")
+        
+        validated_data['user'] = user_profile
+        validated_data['dog'] = kingdog
+        reservation = Reservation.objects.create(**validated_data)
+        return reservation
+
     class Meta:
         model = Reservation
         fields = '__all__'
-        read_only_fields = ['hospital', 'user', 'dog']
+        read_only_fields = ['hospital', 'user']

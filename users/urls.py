@@ -1,7 +1,7 @@
 from django.urls import path, include
 from rest_framework import routers
 
-from .views import DogProfileViewSet,MyPostViewSet,CommentedPostViewSet, MypageViewSet,LikePostViewSet
+from .views import DogProfileViewSet,MyPostViewSet,CommentedPostViewSet, MypageViewSet,LikePostViewSet, ReservationUserViewSet
 
 from django.conf import settings
 from django.conf.urls.static import static
@@ -22,10 +22,14 @@ comment_post_router.register('commentposts', CommentedPostViewSet, basename='com
 myprofile_router = routers.SimpleRouter(trailing_slash=False)
 myprofile_router.register('myprofile',MypageViewSet, basename='myprofile')
 
+reservation_check_router = routers.SimpleRouter(trailing_slash=False)
+reservation_check_router.register('reservation-check', ReservationUserViewSet, basename='reservation-check')
+
 urlpatterns = [
     path('', include(dog_router.urls)),
     path('', include(mypost_router.urls)),
     path('', include(likepost_router.urls)),
     path('', include(comment_post_router.urls)),
     path('', include(myprofile_router.urls)),
+    path('mypage/', include(reservation_check_router.urls)),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

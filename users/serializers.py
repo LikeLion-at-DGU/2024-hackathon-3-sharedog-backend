@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from accounts.models import *
 from community.models import *
-
+from hospital.models import *
 class AddDogProfileSerilizer(serializers.ModelSerializer):
 
     class Meta:
@@ -52,3 +52,16 @@ class MypageSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
         fields = ['nickname','email']
+
+class ReservationSerializer(serializers.ModelSerializer):
+    hospital = serializers.CharField(source='hospital.name', read_only=True)
+    dog = serializers.CharField(source='dog.dog_name', read_only=True)
+    user = serializers.SerializerMethodField(read_only=True)
+
+    def get_user(self, instance):
+        return instance.user.nickname
+    
+    class Meta:
+        model = Reservation
+        fields = '__all__'
+        read_only_fields = ['hospital', 'user', 'dog']
