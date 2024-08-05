@@ -57,7 +57,7 @@ class MyPostSerializer(serializers.ModelSerializer):
         return None
         profile_image = UserProfile.objects.filter(user=user)
 class MypageSerializer(serializers.ModelSerializer):
-    profile_image = serializers.ImageField(use_url=True, required=False)
+    #profile_image = serializers.ImageField(use_url=True, required=False)
     class Meta:
         model = UserProfile
         fields = '__all__'
