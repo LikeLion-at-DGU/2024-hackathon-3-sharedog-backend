@@ -138,13 +138,19 @@ class RegistrationViewSet(viewsets.ModelViewSet):
             user_profile.phone = phone
             user_profile.save()
 
+        serializer = self.get_serializer(user_profile)
+
         if created:
             # 프로필이 새로 생성된 경우에는 전체 프로필 데이터를 반환
             serializer = self.get_serializer(user_profile)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             # 기존 프로필이었고 phone만 업데이트된 경우
-            return Response({"detail": "Profile already exists. Phone number updated."}, status=status.HTTP_200_OK)
+            return Response({
+                "nickname": serializer.data.get("nickname"),
+                "email": serializer.data.get("email"),
+                "phone": serializer.data.get("phone")
+            }, status=status.HTTP_200_OK)
 
     def perform_create(self, serializer):
         # 이 메서드는 더 이상 필요하지 않을 수 있습니다.
