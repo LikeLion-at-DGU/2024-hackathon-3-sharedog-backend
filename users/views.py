@@ -6,6 +6,9 @@ from rest_framework.response import Response
 from community.models import Post, Comment
 from rest_framework.permissions import IsAuthenticated
 from community.permissions import IsOwnerOrReadOnly
+from hospital.models import Reservation
+from hospital.serializers import ReservationSerializer
+
 class DogProfileViewSet(viewsets.ModelViewSet):
     serializer_class = AddDogProfileSerilizer
 
@@ -77,7 +80,13 @@ class MypageViewSet(viewsets.ModelViewSet):
         # UserProfile.objects.get(user=user) 대신
         return UserProfile.objects.filter(user=user)
     
-    def get_permissions(self):
-        if self.action in ["update", "destroy", "partial_update"]:
-            return [IsOwnerOrReadOnly()]
-        return []
+class ReservationUserViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
+    queryset = Reservation.objects.all()
+    serializer_class = ReservationSerializer
+
+    def list(self, request, user_id=None):
+        user = self.request.user
+        user_profile = UserProfile.objects.get(user=user)
+        queryset = self.filter_queryset(self.get_queryset().filter(user=user_profile))
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)

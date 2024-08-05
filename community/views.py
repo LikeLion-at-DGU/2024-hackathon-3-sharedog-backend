@@ -111,23 +111,23 @@ class PostViewSet(viewsets.ModelViewSet):
         return Response()
     
     # 게시물 리스트에서 좋아요 구현
-    @action(methods=['POST'], detail=False)
-    def like_post(self, request):
-        post_id = request.data.get('id')
-        user = self.request.user
-        user_profile = UserProfile.objects.get(user=user)
-        try:
-            like_post = Post.objects.get(pk=post_id)
-            if request.user in like_post.like.all():
-                like_post.like.remove(user_profile)
-                like_post.like_num -= 1
-            else:
-                like_post.like.add(user_profile)
-                like_post.like_num += 1
-            like_post.save()
-            return Response({'like_num': like_post.like_num}, status=status.HTTP_200_OK)
-        except Post.DoesNotExist:
-            return Response({'detail': '게시글을 찾을 수 없습니다.'}, status=status.HTTP_404_NOT_FOUND)
+    # @action(methods=['POST'], detail=False)
+    # def like_post(self, request):
+    #     post_id = request.data.get('id')
+    #     user = self.request.user
+    #     user_profile = UserProfile.objects.get(user=user)
+    #     try:
+    #         like_post = Post.objects.get(pk=post_id)
+    #         if request.user in like_post.like.all():
+    #             like_post.like.remove(user_profile)
+    #             like_post.like_num -= 1
+    #         else:
+    #             like_post.like.add(user_profile)
+    #             like_post.like_num += 1
+    #         like_post.save()
+    #         return Response({'like_num': like_post.like_num}, status=status.HTTP_200_OK)
+    #     except Post.DoesNotExist:
+    #         return Response({'detail': '게시글을 찾을 수 없습니다.'}, status=status.HTTP_404_NOT_FOUND)
     
     @action(methods=["GET"], detail=False, url_path='region/(?P<region>[^/.]+)')
     def filter_by_region(self, request, region=None):

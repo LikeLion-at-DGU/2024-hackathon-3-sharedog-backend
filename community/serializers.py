@@ -40,12 +40,6 @@ class PostListSerializer(serializers.ModelSerializer):
             return user_profile in obj.like.all()
         return False
     
-    def get_image_url(self, obj):
-        request = self.context.get('request')
-        if request and obj.image_1:
-            return request.build_absolute_uri(obj.image_1.url)
-        return None
-    
     image_1 = serializers.ImageField(use_url=True, required=False)
 
     class Meta:
@@ -69,6 +63,7 @@ class PostSerializer(serializers.ModelSerializer):
     is_owner = serializers.SerializerMethodField()
     writer = serializers.SerializerMethodField(read_only=True)
     comments = serializers.SerializerMethodField(read_only=True)
+    is_liked = serializers.SerializerMethodField()
     def get_writer(self, instance):
         writer = instance.writer
         return writer.nickname
@@ -83,6 +78,12 @@ class PostSerializer(serializers.ModelSerializer):
         serializer = CommentSerializer(instance.comments, many=True, context=self.context)
         return serializer.data
 
+    def get_is_liked(self, obj):
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            user_profile = UserProfile.objects.get(user=request.user)
+            return user_profile in obj.like.all()
+        return False
 
     comments_cnt = serializers.SerializerMethodField()
 
@@ -116,6 +117,7 @@ class PostSerializer(serializers.ModelSerializer):
             'updated_at',
             'comments_cnt',
             'like_num',
+            'is_liked'
         ]
 
 class CommentListSerializer(serializers.ModelSerializer):

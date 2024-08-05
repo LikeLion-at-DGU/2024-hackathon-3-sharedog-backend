@@ -74,9 +74,10 @@ class HospitalViewSet(viewsets.ModelViewSet):
 # 여기서 부터 고쳐야함
 class ReservationViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin, mixins.DestroyModelMixin):
     serializer_class = ReservationSerializer
+
     def get_queryset(self):
         user = self.request.user
-        user_profile = UserProfile.objects
+        return Reservation.objects.filter(user=user)
 
 class HospitalReservationViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.CreateModelMixin):
     queryset = Reservation.objects.all()
@@ -90,24 +91,13 @@ class HospitalReservationViewSet(viewsets.GenericViewSet, mixins.ListModelMixin,
     
     def create(self, request, hospital_id=None):
         hospital = get_object_or_404(Hospital, id=hospital_id)
-        # UserProfile을 가져옵니다.
-        user_profile = get_object_or_404(UserProfile, user=request.user)
-        # DogProfile을 필터링합니다.
-        dog = DogProfile.objects.filter(owner=user_profile).first()
-
-        serializer = self.get_serializer(data=request.data)
+        serializer = self.get_serializer(data=request.data, context={'request': request})
         serializer.is_valid(raise_exception=True)
-        # save 메서드에 UserProfile 인스턴스를 전달합니다.
-        serializer.save(hospital=hospital, dog=dog, user=user_profile)
-        return Response(serializer.data)
-
-class ReservationUserViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.DestroyModelMixin):
-    queryset = Reservation.objects.all()
-    serializer_class = ReservationSerializer
-
-    def list(self, request, user_id=None):
-        user = self.request.user
-        queryset = self.filter_queryset(self.get_queryset().filter(user=user))
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
-    
+        serializer.save(hospital=hospital)
+        headers = self.get_success_headers(serializer.data)
+        
+        # 새로 생성된 예약 객체를 다시 직렬화하여 반환
+        new_reservation = Reservation.objects.get(id=serializer.instance.id)
+        new_serializer = self.get_serializer(new_reservation)
+        
+        return Response(new_serializer.data, status=status.HTTP_201_CREATED, headers=headers)
