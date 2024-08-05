@@ -4,7 +4,7 @@ from .models import *
 
 class PostListSerializer(serializers.ModelSerializer):
     comments_cnt = serializers.SerializerMethodField()
-
+    is_liked = serializers.SerializerMethodField()
     def get_comments_cnt(self, instance):
         return instance.comments.count()
     
@@ -32,6 +32,14 @@ class PostListSerializer(serializers.ModelSerializer):
             return f"{int(time_difference.total_seconds() // 3600)}시간 전"
         else:
             return f"{time_difference.days}일 전"
+        
+    def get_is_liked(self, obj):
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            user_profile = UserProfile.objects.get(user=request.user)
+            return user_profile in obj.like.all()
+        return False
+    
     def get_image_url(self, obj):
         request = self.context.get('request')
         if request and obj.image_1:
@@ -53,7 +61,8 @@ class PostListSerializer(serializers.ModelSerializer):
             'comments_cnt',
             'like_num',
             'blood',
-            'region'
+            'region',
+            'is_liked'
         ]
 
 class PostSerializer(serializers.ModelSerializer):
