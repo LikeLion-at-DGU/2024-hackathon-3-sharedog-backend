@@ -67,10 +67,7 @@ class CommentedPostViewSet(viewsets.ReadOnlyModelViewSet):  # ReadOnly로 설정
         commented_posts = Post.objects.filter(comments__writer=user_profile).distinct()
         return commented_posts
 
-class MypageViewSet(mixins.RetrieveModelMixin,
-                    mixins.UpdateModelMixin,
-                    mixins.ListModelMixin,
-                    viewsets.GenericViewSet):
+class MypageViewSet(viewsets.ModelViewSet):
     serializer_class = MypageSerializer
     permission_classes = [IsAuthenticated]
 
@@ -79,3 +76,8 @@ class MypageViewSet(mixins.RetrieveModelMixin,
         user = self.request.user
         # UserProfile.objects.get(user=user) 대신
         return UserProfile.objects.filter(user=user)
+    
+    def get_permissions(self):
+        if self.action in ["update", "destroy", "partial_update"]:
+            return [IsOwnerOrReadOnly()]
+        return []
