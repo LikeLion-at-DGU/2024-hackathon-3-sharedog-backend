@@ -20,4 +20,4 @@ urlpatterns = [
     path('', include(default_router.urls)),
     path('', include(reservation_router.urls)),
     path('home/<int:hospital_id>/', include(hospital_reservation_router.urls)),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+]
