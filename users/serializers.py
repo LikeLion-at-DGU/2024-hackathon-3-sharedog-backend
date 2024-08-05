@@ -59,11 +59,15 @@ class MyPostSerializer(serializers.ModelSerializer):
             # 절대 URL 생성
             return request.build_absolute_uri(obj.image_1.url)
         return None
-    
+        profile_image = UserProfile.objects.filter(user=user)
 class MypageSerializer(serializers.ModelSerializer):
+    #profile_image = serializers.ImageField(use_url=True, required=False)
     class Meta:
         model = UserProfile
-        fields = ['nickname','email']
+        fields = '__all__'
+        read_only_fields = [
+            'id','updated_at','created_at'
+        ]
 
 class MypageReservationSerializer(serializers.ModelSerializer):
     hospital = serializers.ReadOnlyField(source='hospital.name')
