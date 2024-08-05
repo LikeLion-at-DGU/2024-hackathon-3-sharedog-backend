@@ -75,3 +75,4 @@ class Totaltest(models.Model):
     weight_group = models.ForeignKey(Weighttest, on_delete=models.CASCADE)
     is_vaccinated = models.ForeignKey(Vaccinetest, on_delete=models.CASCADE)
     has_disease = models.ForeignKey(Diseasetest, on_delete=models.CASCADE)
+    
