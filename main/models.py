@@ -1,10 +1,11 @@
 from django.db import models
 from django.contrib.auth.models import User
+from accounts.models import UserProfile
 
 # Create your models here.
 class Sizetest(models.Model):
     id = models.AutoField(primary_key=True)
-    nickname = models.ForeignKey(User, on_delete=models.CASCADE, default='')
+    nickname = models.ForeignKey(UserProfile, on_delete=models.CASCADE, default='')
     SIZE_CHOICES = [
         ('소형견', '소형견'),
         ('대형견', '대형견'),
@@ -16,7 +17,7 @@ class Sizetest(models.Model):
     
 class Agetest(models.Model):
     id = models.AutoField(primary_key=True)
-    nickname = models.ForeignKey(User, on_delete=models.CASCADE, default='')
+    nickname = models.ForeignKey(UserProfile, on_delete=models.CASCADE, default='')
     AGE_CHOICES = [
         ('~18M', '18개월 미만'),
         ('18M~8Y', '18개월~8살'),
@@ -29,7 +30,7 @@ class Agetest(models.Model):
     
 class Weighttest(models.Model):
     id = models.AutoField(primary_key=True)
-    nickname = models.ForeignKey(User, on_delete=models.CASCADE, default='')
+    nickname = models.ForeignKey(UserProfile, on_delete=models.CASCADE, default='')
     WEIGHT_CHOICES = [
         ('~20KG', '20kg 이하'),
         ('20KG~', '20kg 이상'),
@@ -42,7 +43,7 @@ class Weighttest(models.Model):
     
 class Vaccinetest(models.Model):
     id = models.AutoField(primary_key=True)
-    nickname = models.ForeignKey(User, on_delete=models.CASCADE, default='')
+    nickname = models.ForeignKey(UserProfile, on_delete=models.CASCADE, default='')
     VACCINE_CHOICES = [
         ('접종', '접종'),
         ('미접종', '미접종'),
@@ -55,7 +56,7 @@ class Vaccinetest(models.Model):
 
 class Diseasetest(models.Model):
     id = models.AutoField(primary_key=True)
-    nickname = models.ForeignKey(User, on_delete=models.CASCADE, default='')
+    nickname = models.ForeignKey(UserProfile, on_delete=models.CASCADE, default='')
     DISEASE_CHOICES = [
         ('네', '네'),
         ('아니요', '아니요'),
@@ -68,7 +69,7 @@ class Diseasetest(models.Model):
     
 class Totaltest(models.Model):
     id = models.AutoField(primary_key=True)
-    nickname = models.ForeignKey(User, on_delete=models.CASCADE)
+    nickname = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     size = models.ForeignKey(Sizetest, on_delete=models.CASCADE)
     age_group = models.ForeignKey(Agetest, on_delete=models.CASCADE)
     weight_group = models.ForeignKey(Weighttest, on_delete=models.CASCADE)

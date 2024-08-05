@@ -21,7 +21,8 @@ class SizetestViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
     
     def perform_create(self, serializer):
-        serializer.save(writer=self.request.user)
+        user_profile = UserProfile.objects.get(user=self.request.user)
+        serializer.save(nickname=user_profile)
 
 class AgetestViewSet(viewsets.ModelViewSet):
     queryset = Agetest.objects.all()
@@ -34,7 +35,8 @@ class AgetestViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
     
     def perform_create(self, serializer):
-        serializer.save(writer=self.request.user)
+        user_profile = UserProfile.objects.get(user=self.request.user)
+        serializer.save(nickname=user_profile)
 
 class WeighttestViewSet(viewsets.ModelViewSet):
     queryset = Weighttest.objects.all()
@@ -47,7 +49,8 @@ class WeighttestViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
     
     def perform_create(self, serializer):
-        serializer.save(writer=self.request.user)
+        user_profile = UserProfile.objects.get(user=self.request.user)
+        serializer.save(nickname=user_profile)
 
 class VaccinetestViewSet(viewsets.ModelViewSet):
     queryset = Vaccinetest.objects.all()
@@ -60,7 +63,8 @@ class VaccinetestViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
     
     def perform_create(self, serializer):
-        serializer.save(writer=self.request.user)
+        user_profile = UserProfile.objects.get(user=self.request.user)
+        serializer.save(nickname=user_profile)
 class DiseasetestViewSet(viewsets.ModelViewSet):
     queryset = Diseasetest.objects.all()
     serializer_class = DiseasetestSerializer
@@ -72,16 +76,18 @@ class DiseasetestViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
     
     def perform_create(self, serializer):
-        disease_instance = serializer.save(writer=self.request.user)
+        user_profile = UserProfile.objects.get(user=self.request.user)
 
-        latest_size = Sizetest.objects.filter(writer=self.request.user).latest('id')
-        latest_age = Agetest.objects.filter(writer=self.request.user).latest('id')
-        latest_weight = Weighttest.objects.filter(writer=self.request.user).latest('id')
-        latest_vaccine = Vaccinetest.objects.filter(writer=self.request.user).latest('id')
+        disease_instance = serializer.save(nickname=user_profile)
+
+        latest_size = Sizetest.objects.filter(nickname=user_profile).latest('id')
+        latest_age = Agetest.objects.filter(nickname=user_profile).latest('id')
+        latest_weight = Weighttest.objects.filter(nickname=user_profile).latest('id')
+        latest_vaccine = Vaccinetest.objects.filter(nickname=user_profile).latest('id')
 
         # 새로운 Totaltest 객체를 생성
         Totaltest.objects.create(
-            writer=self.request.user,
+            nickname=user_profile,
             size=latest_size,
             age_group=latest_age,
             weight_group=latest_weight,
@@ -89,7 +95,7 @@ class DiseasetestViewSet(viewsets.ModelViewSet):
             has_disease=disease_instance
         )
         
-class TotaltestViewSet(viewsets.ModelViewSet):
+class TotaltestViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Totaltest.objects.all()
     serializer_class = TotaltestSerializer
 
