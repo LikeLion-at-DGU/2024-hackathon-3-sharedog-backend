@@ -30,7 +30,7 @@ class PostViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         search_keyword = self.request.GET.get('q', '')
         post_list = Post.objects.all()
-        
+        post_list = post_list.order_by('-created_at')
         if search_keyword:
             if len(search_keyword) > 1:
                 search_post_list = post_list.filter(
