@@ -59,4 +59,4 @@ class MyPostSerializer(serializers.ModelSerializer):
 class MypageSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
-        fields = ['nickname','email']
+        fields = ['nickname','email','profile_image']
