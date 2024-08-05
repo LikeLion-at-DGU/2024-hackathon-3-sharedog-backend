@@ -3,6 +3,7 @@ from accounts.models import *
 from community.models import *
 from hospital.models import *
 class AddDogProfileSerilizer(serializers.ModelSerializer):
+    owner = serializers.CharField(source='owner.nickname', read_only=True)
 
     class Meta:
         model = DogProfile
@@ -12,6 +13,8 @@ class AddDogProfileSerilizer(serializers.ModelSerializer):
             'created_at',
             'updated_at',
         ]
+
+
 
 class MyPostSerializer(serializers.ModelSerializer):
     comments_cnt = serializers.SerializerMethodField()
@@ -24,6 +27,11 @@ class MyPostSerializer(serializers.ModelSerializer):
         return instance.writer.nickname
     
     image_1 = serializers.ImageField(use_url=True, required=False)
+    content = serializers.SerializerMethodField()
+    def get_content(self, instance):
+        if len(instance.content) > 75:
+            return instance.content[:75] + '...'
+        return instance.content
 
     class Meta:
         model = Post
