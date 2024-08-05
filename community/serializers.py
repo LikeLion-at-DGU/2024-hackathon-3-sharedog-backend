@@ -40,12 +40,6 @@ class PostListSerializer(serializers.ModelSerializer):
             return user_profile in obj.like.all()
         return False
     
-    def get_image_url(self, obj):
-        request = self.context.get('request')
-        if request and obj.image_1:
-            return request.build_absolute_uri(obj.image_1.url)
-        return None
-    
     image_1 = serializers.ImageField(use_url=True, required=False)
 
     class Meta:

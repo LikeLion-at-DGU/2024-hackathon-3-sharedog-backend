@@ -32,4 +32,4 @@ urlpatterns = [
     path('', include(comment_post_router.urls)),
     path('', include(myprofile_router.urls)),
     path('mypage/', include(reservation_check_router.urls)),
-]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+]

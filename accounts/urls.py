@@ -21,4 +21,4 @@ urlpatterns = [
     path('', include('dj_rest_auth.urls')),
     path('registration', include('dj_rest_auth.registration.urls')),
     path('', include(registration_router.urls)),
-] + static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)
+]
