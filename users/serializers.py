@@ -21,7 +21,7 @@ class MyPostSerializer(serializers.ModelSerializer):
     
     writer = serializers.SerializerMethodField(read_only=True)
     def get_writer(self, instance):
-        return instance.writer.username
+        return instance.writer.nickname
     
     image_1 = serializers.ImageField(use_url=True, required=False)
 

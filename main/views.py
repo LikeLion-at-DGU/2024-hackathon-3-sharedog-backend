@@ -102,6 +102,9 @@ class MainAPIView(APIView):
         profiles = UserProfile.objects.filter(user=user)
         profiles_data = UserProfileSerializer(profiles, many=True, context={'request': request}).data
         
+        kingdog_profiles = DogProfile.objects.filter(owner__user=user, kingdog=True)
+        kingdog_profiles_data = DogProfileSerializer(kingdog_profiles, many=True, context={'request': request}).data
+
         if region:
             posts = Post.objects.filter(region=region).order_by('-created_at')[:4]
         else:
@@ -110,6 +113,7 @@ class MainAPIView(APIView):
 
         return {
             'profiles': profiles_data,
+            'kingdog_profiles': kingdog_profiles_data,
             'posts': posts_data,
         }
 

@@ -90,12 +90,15 @@ class HospitalReservationViewSet(viewsets.GenericViewSet, mixins.ListModelMixin,
     
     def create(self, request, hospital_id=None):
         hospital = get_object_or_404(Hospital, id=hospital_id)
-        user = self.request.user
-        user_profile = UserProfile.objects.filter(user=user)
-        dog = DogProfile.objects.filter(user=user_profile).first()
+        # UserProfile을 가져옵니다.
+        user_profile = get_object_or_404(UserProfile, user=request.user)
+        # DogProfile을 필터링합니다.
+        dog = DogProfile.objects.filter(owner=user_profile).first()
+
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save(hospital=hospital, dog=dog, user=user)
+        # save 메서드에 UserProfile 인스턴스를 전달합니다.
+        serializer.save(hospital=hospital, dog=dog, user=user_profile)
         return Response(serializer.data)
 
 class ReservationUserViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.DestroyModelMixin):

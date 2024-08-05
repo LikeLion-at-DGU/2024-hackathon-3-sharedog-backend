@@ -1,7 +1,7 @@
 from django.urls import path, include
 from rest_framework import routers
 
-from .views import DogProfileViewSet,MyPostViewSet,CommentedPostViewSet, MypageViewSet
+from .views import DogProfileViewSet,MyPostViewSet,CommentedPostViewSet, MypageViewSet,LikePostViewSet
 
 from django.conf import settings
 from django.conf.urls.static import static
@@ -14,7 +14,7 @@ mypost_router = routers.SimpleRouter(trailing_slash=False)
 mypost_router.register('myposts',MyPostViewSet, basename='myposts')
 
 likepost_router = routers.SimpleRouter(trailing_slash=False)
-likepost_router.register('mylikes',MyPostViewSet, basename='mylikes')
+likepost_router.register('mylikes',LikePostViewSet, basename='mylikes')
 
 comment_post_router = routers.SimpleRouter(trailing_slash=False)
 comment_post_router.register('commentposts', CommentedPostViewSet, basename='commentposts')

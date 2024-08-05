@@ -39,6 +39,7 @@ class Reservation(models.Model):
     id = models.AutoField(primary_key=True)
     hospital = models.ForeignKey(Hospital, on_delete=models.CASCADE, related_name='reservations')
     user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     dog = models.ForeignKey(DogProfile, on_delete=models.CASCADE,null=True)
     selectedDate = models.DateField()
     activeTime = models.CharField(max_length=5, choices=TIME_CHOICES)     
