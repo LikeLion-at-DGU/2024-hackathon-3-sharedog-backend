@@ -80,21 +80,21 @@ class TotaltestSerializer(serializers.ModelSerializer):
         if instance.size.size == '소형견':
             score += 0
         elif instance.size.size == '대형견':
-            score += 10
+            score += 30
 
         # Age에 따른 점수 부여
         if instance.age_group.age_group == '~18M':
             score += 0
         elif instance.age_group.age_group == '18M~8Y':
-            score += 5
+            score += 30
         elif instance.age_group.age_group == '9Y~':
-            score += 10
+            score += 0
 
         # Weight에 따른 점수 부여
         if instance.weight_group.weight_group == '~20KG':
             score += 0
         elif instance.weight_group.weight_group == '20KG~':
-            score += 10
+            score += 30
 
         # Vaccination에 따른 점수 부여
         if instance.is_vaccinated.is_vaccinated == '접종':
@@ -112,7 +112,7 @@ class TotaltestSerializer(serializers.ModelSerializer):
     
     def get_can_blood(self, instance):
         score = self.get_score(instance)
-        return "헌혈 가능" if score >= 30 else "헌혈 불가"
+        return "헌혈 가능" if score >= 90 else "헌혈 불가"
     
     class Meta:
         model = Totaltest

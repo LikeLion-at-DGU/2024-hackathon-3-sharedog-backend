@@ -109,7 +109,6 @@ class DogProfileViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer) 
 
-        dogprofile = serializer.instance
         return Response(serializer.data)
 
     def perform_create(self, serializer):
