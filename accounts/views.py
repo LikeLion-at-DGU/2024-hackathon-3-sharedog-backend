@@ -54,7 +54,8 @@ class KakaoLogin(APIView):
 
             user_profile, created = UserProfile.objects.get_or_create(user=user)
             user_profile.nickname = nickname
-            user_profile.profile_image = profile_image
+            if created or not user_profile.profile_image:
+                user_profile.profile_image = profile_image
             user_profile.email = email
             #user_profile.phone = phone
             user_profile.save()
