@@ -151,3 +151,4 @@ class PostSerializer(serializers.ModelSerializer):
         post = Post.objects.filter(id=obj.id)
         serializer = PostImageSerializer(post, many=True, context=self.context)
         return serializer.data
+    

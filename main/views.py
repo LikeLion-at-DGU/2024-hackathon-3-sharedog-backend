@@ -9,6 +9,7 @@ from .serializers import SizetestSerializer, AgetestSerializer, WeighttestSerial
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
+from hospital.models import *
 
 class SizetestViewSet(viewsets.ModelViewSet):
     queryset = Sizetest.objects.all()
@@ -111,6 +112,8 @@ class MainAPIView(APIView):
         kingdog_profiles = DogProfile.objects.filter(owner__user=user, kingdog=True)
         kingdog_profiles_data = DogProfileSerializer(kingdog_profiles, many=True, context={'request': request}).data
 
+        reservation_cnt = Reservation.objects.filter(user__user=user, blood_donation_completed=True).count()
+
         if region:
             posts = Post.objects.filter(region=region).order_by('-created_at')[:5]
         else:
@@ -121,6 +124,7 @@ class MainAPIView(APIView):
             'profiles': profiles_data,
             'kingdog_profiles': kingdog_profiles_data,
             'posts': posts_data,
+            'reservation_cnt' : reservation_cnt
         }
 
 class FilterByRegionAPIView(APIView):
