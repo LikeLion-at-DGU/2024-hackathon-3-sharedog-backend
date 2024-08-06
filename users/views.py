@@ -33,14 +33,14 @@ class DogProfileViewSet(viewsets.ModelViewSet):
         serializer.save(owner=user_profile)
 
 class MyPostViewSet(viewsets.ModelViewSet):
-    queryset = Post.objects.all()
+    # queryset = Post.objects.all()
     serializer_class = MyPostSerializer
 
     def get_queryset(self):
 
         user = self.request.user
         user_profile = user.userprofile
-        return Post.objects.filter(writer=user_profile)
+        return Post.objects.filter(writer=user_profile).order_by('-created_at')
     
     def get_permissions(self):
         if self.action in ["update", "destroy", "partial_update"]:

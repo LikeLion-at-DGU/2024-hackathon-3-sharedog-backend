@@ -3,6 +3,7 @@ from .models import *
 from accounts.models import *
 from community.models import *
 from datetime import datetime, timedelta
+from community.serializers import *
 
 class SizetestSerializer(serializers.ModelSerializer):
 
@@ -139,9 +140,14 @@ class PostSerializer(serializers.ModelSerializer):
         model = Post
         fields = ['id','blood','region','title','content','image_1','created_at']
 
+    # def get_image_1(self, obj):
+    #     request = self.context.get('request')
+    #     if request and obj.image_1:
+    #         # 절대 URL 생성
+    #         return request.build_absolute_uri(obj.image_1.url)
+    #     return None
+    
     def get_image_1(self, obj):
-        request = self.context.get('request')
-        if request and obj.image_1:
-            # 절대 URL 생성
-            return request.build_absolute_uri(obj.image_1.url)
-        return None
+        post = Post.objects.filter(id=obj.id)
+        serializer = PostImageSerializer(post, many=True, context=self.context)
+        return serializer.data
