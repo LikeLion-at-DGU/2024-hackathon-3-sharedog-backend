@@ -12,6 +12,13 @@ class KingdogImageSerializer(serializers.ModelSerializer):
         model = DogProfile
         fields = ['dog_image']
 
+class PostImageSerializer(serializers.ModelSerializer):
+    image_1 = serializers.ImageField(use_url=True, required=False)
+
+    class Meta:
+        model = Post
+        fields = ['image_1']
+
 class PostListSerializer(serializers.ModelSerializer):
     comments_cnt = serializers.SerializerMethodField()
     is_liked = serializers.SerializerMethodField()

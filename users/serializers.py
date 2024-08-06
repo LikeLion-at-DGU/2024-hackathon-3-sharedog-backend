@@ -5,6 +5,7 @@ from community.models import *
 from hospital.models import *
 from accounts.serializers import *
 from django.utils.timezone import make_aware
+from community.serializers import *
 
 class AddDogProfileSerilizer(serializers.ModelSerializer):
     owner = serializers.CharField(source='owner.nickname', read_only=True)
@@ -54,12 +55,17 @@ class MyPostSerializer(serializers.ModelSerializer):
             ]
 
     def get_image_1(self, obj):
-        request = self.context.get('request')
-        if request and obj.image_1:
-            # 절대 URL 생성
-            return request.build_absolute_uri(obj.image_1.url)
-        return None
-        profile_image = UserProfile.objects.filter(user=user)
+        post = Post.objects.filter(id=obj.id)
+        serializer = PostImageSerializer(post, many=True, context=self.context)
+        return serializer.data
+
+    # def get_image_1(self, obj):
+    #     request = self.context.get('request')
+    #     if request and obj.image_1:
+    #         # 절대 URL 생성
+    #         return request.build_absolute_uri(obj.image_1.url)
+    #     return None
+    #     profile_image = UserProfile.objects.filter(user=user)
 class MypageSerializer(serializers.ModelSerializer):
     #profile_image = serializers.ImageField(use_url=True, required=False)
     class Meta:
