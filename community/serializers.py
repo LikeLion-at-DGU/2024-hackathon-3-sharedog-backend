@@ -232,6 +232,12 @@ class CommentSerializer(serializers.ModelSerializer):
         kingdog_profiles = DogProfile.objects.filter(owner=obj.writer, kingdog=True)
         serializer = KingdogImageSerializer(kingdog_profiles, many=True, context=self.context)
         return serializer.data
+    
+    kingdog_profile_comment = serializers.SerializerMethodField
+    def get_kingdog_profile(self, obj):
+        kingdog_profiles = DogProfile.objects.filter(owner=obj.writer, kingdog=True)
+        serializer = KingdogImageSerializer(kingdog_profiles, many=True, context=self.context)
+        return serializer.data
 
     class Meta:
         model = Comment
