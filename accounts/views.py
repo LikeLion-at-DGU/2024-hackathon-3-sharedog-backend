@@ -75,22 +75,36 @@ class KakaoLogin(APIView):
             "access": str(refresh.access_token),
         }, status=status.HTTP_200_OK)
 
-@api_view(['GET'])
+@api_view(['GET', 'DELETE'])
 @permission_classes([IsAuthenticated])
 def protected_view(request):
     user = request.user
-    user_profile = UserProfile.objects.get(user=user)
-    user_profile_serializer = UserProfileSerializer(user_profile)
 
-    user_data = {
-        "username": user.username,
-        "email": user.email,
-        "first_name": user.first_name,
-        "last_name": user.last_name,
-        "user_profile": user_profile_serializer.data,
-    }
-    return Response(user_data, status=status.HTTP_200_OK)
+    if request.method == 'GET':
+        user_profile = UserProfile.objects.get(user=user)
+        user_profile_serializer = UserProfileSerializer(user_profile)
 
+        user_data = {
+            "username": user.username,
+            "email": user.email,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            "user_profile": user_profile_serializer.data,
+        }
+        return Response(user_data, status=status.HTTP_200_OK)
+
+    elif request.method == 'DELETE':
+        # Delete the user profile
+        try:
+            user_profile = UserProfile.objects.get(user=user)
+            user_profile.delete()
+        except UserProfile.DoesNotExist:
+            pass
+
+        # Delete the user account
+        user.delete()
+
+        return Response({"detail": "User and associated profile deleted."}, status=status.HTTP_204_NO_CONTENT)
 @api_view(['GET'])
 def check_user_status(request):
     user = request.user
@@ -156,3 +170,4 @@ class RegistrationViewSet(viewsets.ModelViewSet):
         # 이 메서드는 더 이상 필요하지 않을 수 있습니다.
         # serializer.save(user=self.request.user)
         pass
+
