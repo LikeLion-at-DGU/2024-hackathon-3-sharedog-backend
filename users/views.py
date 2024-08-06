@@ -32,7 +32,7 @@ class DogProfileViewSet(viewsets.ModelViewSet):
         user_profile, created = UserProfile.objects.get_or_create(user=user)
         serializer.save(owner=user_profile)
 
-class MyPostViewSet(viewsets.ModelViewSet):
+class MyPostViewSet(viewsets.ReadOnlyModelViewSet):
     # queryset = Post.objects.all()
     serializer_class = MyPostSerializer
 
@@ -57,7 +57,7 @@ class LikePostViewSet(viewsets.ReadOnlyModelViewSet):  # ReadOnly로 설정하�
         user_profile = user.userprofile
         # 사용자가 좋아요를 누른 게시물만 반환합니다.
         liked_posts = Post.objects.filter(like=user_profile)
-        return liked_posts
+        return liked_posts.order_by('-created_at')
     
 class CommentedPostViewSet(viewsets.ReadOnlyModelViewSet):  # ReadOnly로 설정하여 읽기 전용
     serializer_class = MyPostSerializer
@@ -69,7 +69,7 @@ class CommentedPostViewSet(viewsets.ReadOnlyModelViewSet):  # ReadOnly로 설정
         # 사용자가 작성한 댓글의 게시물만 반환합니다.
         user_profile = UserProfile.objects.get(user=user)
         commented_posts = Post.objects.filter(comments__writer=user_profile).distinct()
-        return commented_posts
+        return commented_posts.order_by('-created_at')
 
 class MypageViewSet(viewsets.ModelViewSet):
     serializer_class = MypageSerializer
