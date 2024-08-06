@@ -97,12 +97,11 @@ class MypageViewSet(viewsets.ModelViewSet):
     def update(self, request, *args, **kwargs):
         # 업데이트할 인스턴스를 가져오고 시리얼라이저를 통해 데이터 갱신
         user = self.request.user
-        user_profile = UserProfile.objects.get(user=user)
+        user_profile, created = UserProfile.objects.get_or_create(user=user)
 
         serializer = self.get_serializer(user_profile, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-
         return Response(serializer.data)
     
 class ReservationUserViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
