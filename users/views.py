@@ -17,7 +17,7 @@ class DogProfileViewSet(viewsets.ModelViewSet):
         # 현재 요청을 보낸 사용자의 UserProfile과 연결된 DogProfile만 반환
         user = self.request.user
         user_profile = UserProfile.objects.get(user=user)
-        return DogProfile.objects.filter(owner=user_profile)
+        return DogProfile.objects.filter(owner=user_profile).order_by('-kingdog', 'id')
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
