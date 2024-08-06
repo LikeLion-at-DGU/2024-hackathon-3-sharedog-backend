@@ -63,4 +63,3 @@ class Recomment(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     # image = models.ForeignKey(Profile, null=True, related_name='recomments', on_delete=models.CASCADE)
-    reservation_cnt = models.IntegerField()
