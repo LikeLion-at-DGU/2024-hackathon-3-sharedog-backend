@@ -84,29 +84,29 @@ class TotaltestSerializer(serializers.ModelSerializer):
             score += 30
 
         # Age에 따른 점수 부여
-        if instance.age_group.age_group == '~18M':
+        if instance.age_group.age_group == '18개월 미만이에요':
             score += 0
-        elif instance.age_group.age_group == '18M~8Y':
+        elif instance.age_group.age_group == '18개월 이상 8세 이하에요':
             score += 30
-        elif instance.age_group.age_group == '9Y~':
+        elif instance.age_group.age_group == '9세 이상이에요':
             score += 0
 
         # Weight에 따른 점수 부여
-        if instance.weight_group.weight_group == '~20KG':
+        if instance.weight_group.weight_group == '20kg 이하에요':
             score += 0
-        elif instance.weight_group.weight_group == '20KG~':
+        elif instance.weight_group.weight_group == '20kg 이상이에요':
             score += 30
 
         # Vaccination에 따른 점수 부여
-        if instance.is_vaccinated.is_vaccinated == '접종':
+        if instance.is_vaccinated.is_vaccinated == '네! 매월 챙기고 있어요':
             score += 10
-        elif instance.is_vaccinated.is_vaccinated == '미접종':
+        elif instance.is_vaccinated.is_vaccinated == '아니요! 매월 챙기지 못했어요':
             score -= 0
 
         # Disease에 따른 점수 부여
-        if instance.has_disease.has_disease == '네':
+        if instance.has_disease.has_disease == '네! 앓았던 적이 있어요':
             score -= 0
-        elif instance.has_disease.has_disease == '아니요':
+        elif instance.has_disease.has_disease == '아니요! 앓았던 적이 없어요':
             score += 10
 
         return score
