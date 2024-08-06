@@ -9,7 +9,17 @@ from community.serializers import *
 
 class AddDogProfileSerilizer(serializers.ModelSerializer):
     owner = serializers.CharField(source='owner.nickname', read_only=True)
+    dog_unique = serializers.SerializerMethodField()
 
+    def get_dog_unique(self, object):
+        request = self.context.get('request', None)
+        user = request.user
+        user_profile = UserProfile.objects.get(user=user)
+        dog_cnt = DogProfile.objects.filter(owner=user_profile).count()
+        if dog_cnt == 1:
+            return True
+        else:
+            return False
     class Meta:
         model = DogProfile
         fields = '__all__'
